@@ -2,8 +2,10 @@ package com.PMT.Backend_PMT.service;
 
 import com.PMT.Backend_PMT.dto.UserDto;
 import com.PMT.Backend_PMT.entity.User;
+import com.PMT.Backend_PMT.exception.ResourceNotFoundException;
 import com.PMT.Backend_PMT.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,5 +43,10 @@ public class UserService {
     //Read
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 }
