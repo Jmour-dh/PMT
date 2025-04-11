@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -15,6 +17,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    //Create
     @Transactional
     public User createUser(UserDto userDto) {
         if (userDto.getPassword() == null || userDto.getPassword().isBlank()) {
@@ -33,5 +36,10 @@ public class UserService {
         user.setEmail(userDto.getEmail());
         user.setPasswordHash(passwordEncoder.encode(userDto.getPassword()));
         return userRepository.save(user);
+    }
+
+    //Read
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }
