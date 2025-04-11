@@ -20,9 +20,23 @@ public class TaskHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
-    private String changeDescription;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", nullable = false)
+    private Task task;
 
-    @CreationTimestamp
-    private LocalDateTime changeAt;
+    @Column(name = "changed_field", nullable = false)
+    private String changedField;
+
+    @Column(name = "old_value", columnDefinition = "TEXT")
+    private String oldValue;
+
+    @Column(name = "new_value", columnDefinition = "TEXT")
+    private String newValue;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "modified_by", nullable = false)
+    private User modifiedBy;
+
+    @Column(name = "modification_date", nullable = false)
+    private LocalDateTime modificationDate = LocalDateTime.now();
 }

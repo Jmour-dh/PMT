@@ -1,4 +1,4 @@
-package com.PMT.Backend_PMT.entity;
+package com.PMT.Backend_PMT.enumeration;
 
 public enum TaskStatus {
     TODO,

@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -21,15 +22,24 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column( nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
     @Column(nullable = false)
-    private String password;
+    private String passwordHash;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
+    private List<Project> createdProjects;
+
+    @OneToMany(mappedBy = "user")
+    private List<ProjectMember> projectMemberships;
+
+    @OneToMany(mappedBy = "assignee")
+    private List<Task> assignedTasks;
 }
