@@ -5,7 +5,6 @@ import com.PMT.Backend_PMT.entity.User;
 import com.PMT.Backend_PMT.exception.ResourceNotFoundException;
 import com.PMT.Backend_PMT.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,5 +74,14 @@ public class UserService {
         }
 
         return userRepository.save(existingUser);
+    }
+
+    //Delete
+    @Transactional
+    public void deleteUser(Long id){
+        if (!userRepository.existsById(id)){
+            throw new ResourceNotFoundException("User not found with id:" + id);
+        }
+        userRepository.deleteById(id);
     }
 }
