@@ -49,4 +49,31 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
+
+    //Update
+    @Transactional
+    public User updateUser(Long id, UserDto userDto) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        if (userDto.getUsername() != null && !userDto.getUsername().isBlank()) {
+            if (userRepository.existsByUsername(userDto.getUsername()) && !existingUser.getUsername().equals(userDto.getUsername())) {
+                throw new IllegalArgumentException("Username already exists");
+            }
+            existingUser.setUsername(userDto.getUsername());
+        }
+
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            if (userRepository.existsByEmail(userDto.getEmail()) && !existingUser.getEmail().equals(userDto.getEmail())) {
+                throw new IllegalArgumentException("Email already exists");
+            }
+            existingUser.setEmail(userDto.getEmail());
+        }
+
+        if (userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
+            existingUser.setPasswordHash(passwordEncoder.encode(userDto.getPassword()));
+        }
+
+        return userRepository.save(existingUser);
+    }
 }
