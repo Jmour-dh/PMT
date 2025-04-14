@@ -56,13 +56,20 @@ public class ProjectService {
         Project existingProject = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id));
 
-        User creator = userRepository.findById(projectDTO.getCreatedById())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + projectDTO.getCreatedById()));
-
-        existingProject.setName(projectDTO.getName());
-        existingProject.setDescription(projectDTO.getDescription());
-        existingProject.setStartDate(projectDTO.getStartDate());
-        existingProject.setCreatedBy(creator);
+        if (projectDTO.getName() != null) {
+            existingProject.setName(projectDTO.getName());
+        }
+        if (projectDTO.getDescription() != null) {
+            existingProject.setDescription(projectDTO.getDescription());
+        }
+        if (projectDTO.getStartDate() != null) {
+            existingProject.setStartDate(projectDTO.getStartDate());
+        }
+        if (projectDTO.getCreatedById() != null) {
+            User creator = userRepository.findById(projectDTO.getCreatedById())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + projectDTO.getCreatedById()));
+            existingProject.setCreatedBy(creator);
+        }
 
         Project updatedProject = projectRepository.save(existingProject);
         return new ProjectDto(updatedProject);
