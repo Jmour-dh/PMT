@@ -45,24 +45,24 @@ public class UserService {
     public List<UserDetailsDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> new UserDetailsDto(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getCreatedAt().toString()
-                ))
+                .map(user -> {
+                    if (user.getCreatedProjects() != null) {
+                        user.getCreatedProjects().size();
+                    }
+                    return new UserDetailsDto(user);
+                })
                 .collect(Collectors.toList());
     }
 
     public UserDetailsDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        return new UserDetailsDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getCreatedAt().toString()
-        );
+
+        if (user.getCreatedProjects() != null) {
+            user.getCreatedProjects().size();
+        }
+
+        return new UserDetailsDto(user);
     }
 
     //Update
