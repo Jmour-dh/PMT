@@ -1,5 +1,6 @@
 package com.PMT.Backend_PMT.service;
 
+import com.PMT.Backend_PMT.dto.UserDetailsDto;
 import com.PMT.Backend_PMT.dto.UserDto;
 import com.PMT.Backend_PMT.entity.User;
 import com.PMT.Backend_PMT.exception.ResourceNotFoundException;
@@ -41,17 +42,27 @@ public class UserService {
     }
 
     //Read
-    public List<UserDto> getAllUsers() {
+    public List<UserDetailsDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(UserDto::new)
+                .map(user -> new UserDetailsDto(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getCreatedAt().toString()
+                ))
                 .collect(Collectors.toList());
     }
 
-    public UserDto getUserById(Long id) {
+    public UserDetailsDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        return new UserDto(user);
+        return new UserDetailsDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt().toString()
+        );
     }
 
     //Update

@@ -1,5 +1,6 @@
 package com.PMT.Backend_PMT.controller;
 
+import com.PMT.Backend_PMT.dto.UserDetailsDto;
 import com.PMT.Backend_PMT.dto.UserDto;
 import com.PMT.Backend_PMT.entity.User;
 import com.PMT.Backend_PMT.service.UserService;
@@ -25,12 +26,12 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<UserDto>> getAllUsers(){
+    public ResponseEntity<List<UserDetailsDto>> getAllUsers(){
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDetailsDto> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
