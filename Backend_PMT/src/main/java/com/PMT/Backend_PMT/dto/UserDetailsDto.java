@@ -26,7 +26,7 @@ public class UserDetailsDto {
         this.id = id;
         this.username = username;
         this.email = email;
-        this.createdAt = LocalDateTime.parse(createdAt); // Convertir la chaîne en LocalDateTime
+        this.createdAt = LocalDateTime.parse(createdAt);
     }
 
     public UserDetailsDto(User user) {

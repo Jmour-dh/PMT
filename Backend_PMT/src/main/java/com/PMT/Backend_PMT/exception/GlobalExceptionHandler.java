@@ -17,4 +17,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(UserAlreadyMemberException.class)
+    public ResponseEntity<String> handleUserAlreadyMemberException(UserAlreadyMemberException ex) {
+        return ResponseEntity.status(409).body(ex.getMessage());
+    }
 }

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,11 +29,20 @@ public class ProjectDto {
     @NotNull(message = "Creator ID is required")
     private Long createdById;
 
+    private List<ProjectMemberDto> members;
+
     public ProjectDto(Project project) {
         this.id = project.getId();
         this.name = project.getName();
         this.description = project.getDescription();
         this.startDate = project.getStartDate();
         this.createdById = project.getCreatedBy().getId();
+        this.members = project.getMembers()
+                .stream()
+                .map(member -> new ProjectMemberDto(
+                        member.getUser().getId(),
+                        member.getUser().getUsername(),
+                        member.getRole()))
+                .toList();
     }
 }

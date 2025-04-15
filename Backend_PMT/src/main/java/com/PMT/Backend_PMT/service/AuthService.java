@@ -18,10 +18,10 @@ public class AuthService {
 
     public String authenticate(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Cet utilisateur n'existe pas avec l'email : " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("This user does not exist with the email: " + email));
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw new IllegalArgumentException("Mot de passe incorrect");
+            throw new IllegalArgumentException("Incorrect password");
         }
 
         return jwtUtil.generateToken(email);

@@ -6,6 +6,7 @@ import com.PMT.Backend_PMT.entity.ProjectMember;
 import com.PMT.Backend_PMT.entity.User;
 import com.PMT.Backend_PMT.enumeration.Role;
 import com.PMT.Backend_PMT.exception.ResourceNotFoundException;
+import com.PMT.Backend_PMT.exception.UserAlreadyMemberException;
 import com.PMT.Backend_PMT.repository.ProjectMemberRepository;
 import com.PMT.Backend_PMT.repository.ProjectRepository;
 import com.PMT.Backend_PMT.repository.UserRepository;
@@ -21,22 +22,23 @@ public class ProjectMemberService {
     private final ProjectMemberRepository projectMemberRepository;
 
     public void inviteMember(Long projectId, InviteMemberDto inviteMemberDto) {
-        // Vérifier si le projet existe
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Projet non trouvé avec l'ID : " + projectId));
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found with ID: " + projectId));
 
-        // Vérifier si l'utilisateur existe
         User user = userRepository.findByEmail(inviteMemberDto.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé avec l'email : " + inviteMemberDto.getEmail()));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + inviteMemberDto.getEmail()));
 
-        // Créer un nouveau membre du projet
+        boolean isAlreadyMember = projectMemberRepository.existsByUserAndProject(user, project);
+        if (isAlreadyMember) {
+            throw new UserAlreadyMemberException("The user is already a member of this project.");
+        }
+
         ProjectMember projectMember = ProjectMember.builder()
                 .user(user)
                 .project(project)
                 .role(inviteMemberDto.getRole())
                 .build();
 
-        // Sauvegarder le membre du projet
         projectMemberRepository.save(projectMember);
     }
 }

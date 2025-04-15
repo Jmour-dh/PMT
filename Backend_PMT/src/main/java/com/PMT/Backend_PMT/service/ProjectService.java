@@ -2,8 +2,11 @@ package com.PMT.Backend_PMT.service;
 
 import com.PMT.Backend_PMT.dto.ProjectDto;
 import com.PMT.Backend_PMT.entity.Project;
+import com.PMT.Backend_PMT.entity.ProjectMember;
 import com.PMT.Backend_PMT.entity.User;
+import com.PMT.Backend_PMT.enumeration.Role;
 import com.PMT.Backend_PMT.exception.ResourceNotFoundException;
+import com.PMT.Backend_PMT.repository.ProjectMemberRepository;
 import com.PMT.Backend_PMT.repository.ProjectRepository;
 import com.PMT.Backend_PMT.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +24,9 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final ProjectMemberRepository projectMemberRepository;
 
+    @Transactional
     public ProjectDto createProject(ProjectDto projectDTO) {
         User creator = userRepository.findById(projectDTO.getCreatedById())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + projectDTO.getCreatedById()));
@@ -33,6 +38,14 @@ public class ProjectService {
         project.setCreatedBy(creator);
 
         Project savedProject = projectRepository.save(project);
+
+        ProjectMember projectMember = ProjectMember.builder()
+                .user(creator)
+                .project(savedProject)
+                .role(Role.ADMIN)
+                .build();
+        projectMemberRepository.save(projectMember);
+
         return new ProjectDto(savedProject);
     }
 

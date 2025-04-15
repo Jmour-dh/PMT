@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InviteMemberDto {
 
-    @NotBlank(message = "L'email est requis")
-    @Email(message = "L'email doit être valide")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
     private String email;
 
-    @NotBlank(message = "Le rôle est requis")
+    @NotBlank(message = "Role is required")
     private Role role;
 }
