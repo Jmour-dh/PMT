@@ -146,4 +146,34 @@ public class TaskService {
                 task.getProject().getId()
         );
     }
+
+    @Transactional
+    public TaskDto assignTaskToProject(Long projectId, Long taskId, Long userId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with ID: " + taskId));
+
+        if (!task.getProject().getId().equals(projectId)) {
+            throw new IllegalArgumentException("Task does not belong to the specified project.");
+        }
+
+        if (task.getAssignee() != null) {
+            throw new IllegalArgumentException("Task is already assigned to a user.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+        boolean isMember = task.getProject().getMembers().stream()
+                .anyMatch(member -> member.getUser().getId().equals(user.getId()) &&
+                        (member.getRole() == Role.MEMBER || member.getRole() == Role.ADMIN));
+
+        if (!isMember) {
+            throw new IllegalArgumentException("User is not a member of the project or does not have the required role.");
+        }
+
+        task.setAssignee(user);
+        Task updatedTask = taskRepository.save(task);
+
+        return mapToDto(updatedTask);
+    }
 }

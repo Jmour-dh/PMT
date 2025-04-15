@@ -42,4 +42,12 @@ public class TaskController {
         taskService.deleteTask(id, userId);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{projectId}/{taskId}/assign/{userId}")
+    public ResponseEntity<TaskDto> assignTaskToProject(
+            @PathVariable Long projectId,
+            @PathVariable Long taskId,
+            @PathVariable Long userId) {
+        return ResponseEntity.ok(taskService.assignTaskToProject(projectId, taskId, userId));
+    }
 }
