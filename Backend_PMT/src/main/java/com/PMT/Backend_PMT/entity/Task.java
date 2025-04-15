@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,13 +28,7 @@ public class Task {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
     private LocalDateTime dueDate;
-
-    @Column(name = "completed_at")
-    private LocalDateTime completedAt;
 
     @Enumerated(EnumType.STRING)
     private TaskPriority priority;

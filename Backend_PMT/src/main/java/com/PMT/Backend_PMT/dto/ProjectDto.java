@@ -35,7 +35,7 @@ public class ProjectDto {
         this.id = project.getId();
         this.name = project.getName();
         this.description = project.getDescription();
-        this.startDate = project.getStartDate();
+        this.startDate = project.getStartDate().toLocalDate();
         this.createdById = project.getCreatedBy().getId();
         this.members = project.getMembers()
                 .stream()

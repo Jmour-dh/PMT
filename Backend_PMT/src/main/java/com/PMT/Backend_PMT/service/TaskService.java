@@ -1,0 +1,149 @@
+package com.PMT.Backend_PMT.service;
+
+import com.PMT.Backend_PMT.dto.TaskDto;
+import com.PMT.Backend_PMT.entity.Task;
+import com.PMT.Backend_PMT.entity.User;
+import com.PMT.Backend_PMT.entity.Project;
+import com.PMT.Backend_PMT.enumeration.Role;
+import com.PMT.Backend_PMT.enumeration.TaskStatus;
+import com.PMT.Backend_PMT.exception.ResourceNotFoundException;
+import com.PMT.Backend_PMT.repository.TaskRepository;
+import com.PMT.Backend_PMT.repository.UserRepository;
+import com.PMT.Backend_PMT.repository.ProjectRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class TaskService {
+
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
+
+    @Transactional
+    public TaskDto createTask(TaskDto taskDto) {
+        User createdBy = userRepository.findById(taskDto.getCreatedById())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + taskDto.getCreatedById()));
+
+        Project project = projectRepository.findById(taskDto.getProjectId())
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found with ID: " + taskDto.getProjectId()));
+
+        validateUserPermission(createdBy, project);
+
+        final User assignee;
+        if (taskDto.getAssigneeId() != null) {
+            assignee = userRepository.findById(taskDto.getAssigneeId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + taskDto.getAssigneeId()));
+
+            validateAssigneeIsProjectMember(assignee, project);
+        } else {
+            assignee = null;
+        }
+
+        Task task = Task.builder()
+                .title(taskDto.getTitle())
+                .description(taskDto.getDescription())
+                .dueDate(taskDto.getDueDate())
+                .priority(taskDto.getPriority())
+                .status(taskDto.getStatus() != null ? taskDto.getStatus() : TaskStatus.TODO)
+                .createdBy(createdBy)
+                .assignee(assignee)
+                .project(project)
+                .build();
+
+        Task savedTask = taskRepository.save(task);
+        return mapToDto(savedTask);
+    }
+
+    @Transactional
+    public TaskDto updateTask(Long id, TaskDto taskDto) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with ID: " + id));
+
+        User currentUser = userRepository.findById(taskDto.getCreatedById())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + taskDto.getCreatedById()));
+
+        validateUserPermission(currentUser, task.getProject());
+
+        if (taskDto.getTitle() != null) task.setTitle(taskDto.getTitle());
+        if (taskDto.getDescription() != null) task.setDescription(taskDto.getDescription());
+        if (taskDto.getDueDate() != null) task.setDueDate(taskDto.getDueDate());
+        if (taskDto.getPriority() != null) task.setPriority(taskDto.getPriority());
+        if (taskDto.getStatus() != null) task.setStatus(taskDto.getStatus());
+
+        if (taskDto.getAssigneeId() != null) {
+            User assignee = userRepository.findById(taskDto.getAssigneeId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + taskDto.getAssigneeId()));
+
+            validateAssigneeIsProjectMember(assignee, task.getProject());
+            task.setAssignee(assignee);
+        }
+
+        Task updatedTask = taskRepository.save(task);
+        return mapToDto(updatedTask);
+    }
+
+    @Transactional
+    public void deleteTask(Long id, Long userId) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with ID: " + id));
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+        validateUserPermission(currentUser, task.getProject());
+
+        taskRepository.delete(task);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TaskDto> getAllTasks() {
+        return taskRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public TaskDto getTaskById(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with ID: " + id));
+        return mapToDto(task);
+    }
+
+    private void validateUserPermission(User user, Project project) {
+        boolean hasPermission = project.getMembers().stream()
+                .anyMatch(member -> member.getUser().getId().equals(user.getId()) &&
+                        (member.getRole() == Role.ADMIN || member.getRole() == Role.MEMBER));
+        if (!hasPermission) {
+            throw new IllegalArgumentException("You do not have the necessary permissions to perform this action.");
+        }
+    }
+
+    private void validateAssigneeIsProjectMember(User assignee, Project project) {
+        boolean isMember = project.getMembers().stream()
+                .anyMatch(member -> member.getUser().getId().equals(assignee.getId()));
+        if (!isMember) {
+            throw new IllegalArgumentException("The assigned user is not a member of the project.");
+        }
+    }
+
+    private TaskDto mapToDto(Task task) {
+        return new TaskDto(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getDueDate(),
+                task.getPriority(),
+                task.getStatus(),
+                task.getCreatedBy().getId(),
+                task.getAssignee() != null ? task.getAssignee().getId() : null,
+                task.getProject().getId()
+        );
+    }
+}

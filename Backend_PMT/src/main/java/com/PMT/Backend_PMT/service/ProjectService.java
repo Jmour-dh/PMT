@@ -34,7 +34,7 @@ public class ProjectService {
         Project project = new Project();
         project.setName(projectDTO.getName());
         project.setDescription(projectDTO.getDescription());
-        project.setStartDate(projectDTO.getStartDate());
+        project.setStartDate(projectDTO.getStartDate().atStartOfDay());
         project.setCreatedBy(creator);
 
         Project savedProject = projectRepository.save(project);
@@ -45,6 +45,8 @@ public class ProjectService {
                 .role(Role.ADMIN)
                 .build();
         projectMemberRepository.save(projectMember);
+
+        savedProject.getMembers().add(projectMember);
 
         return new ProjectDto(savedProject);
     }
@@ -76,7 +78,7 @@ public class ProjectService {
             existingProject.setDescription(projectDTO.getDescription());
         }
         if (projectDTO.getStartDate() != null) {
-            existingProject.setStartDate(projectDTO.getStartDate());
+            existingProject.setStartDate(projectDTO.getStartDate().atStartOfDay());
         }
         if (projectDTO.getCreatedById() != null) {
             User creator = userRepository.findById(projectDTO.getCreatedById())
