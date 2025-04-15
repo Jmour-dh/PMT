@@ -49,6 +49,9 @@ public class UserService {
                     if (user.getCreatedProjects() != null) {
                         user.getCreatedProjects().size();
                     }
+                    if (user.getProjectMemberships() != null) {
+                        user.getProjectMemberships().size();
+                    }
                     return new UserDetailsDto(user);
                 })
                 .collect(Collectors.toList());
@@ -60,6 +63,9 @@ public class UserService {
 
         if (user.getCreatedProjects() != null) {
             user.getCreatedProjects().size();
+        }
+        if (user.getProjectMemberships() != null) {
+            user.getProjectMemberships().size();
         }
 
         return new UserDetailsDto(user);
