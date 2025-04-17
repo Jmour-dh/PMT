@@ -24,6 +24,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final EmailService emailService;
 
     @Transactional
     public TaskDto createTask(TaskDto taskDto) {
@@ -173,6 +174,24 @@ public class TaskService {
 
         task.setAssignee(user);
         Task updatedTask = taskRepository.save(task);
+
+        // Send email notification to project members
+        List<String> recipientEmails = task.getProject().getMembers().stream()
+                .map(member -> member.getUser().getEmail())
+                .toList();
+
+        String subject = "Nouvelle tâche assignée : " + task.getTitle();
+        String content = String.format(
+                "Bonjour,\n\nUne nouvelle tâche a été assignée dans le projet \"%s\".\n\n" +
+                        "Titre de la tâche : %s\nDescription : %s\nDate d'échéance : %s\n\n" +
+                        "Cordialement,\nL'équipe PMT",
+                task.getProject().getName(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getDueDate() != null ? task.getDueDate().toString() : "Non spécifiée"
+        );
+
+        emailService.sendEmail(subject, content, recipientEmails);
 
         return mapToDto(updatedTask);
     }
