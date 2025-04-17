@@ -181,10 +181,20 @@ public class TaskService {
                 .toList();
 
         String subject = "Nouvelle tâche assignée : " + task.getTitle();
-        String content = String.format(
-                "Bonjour,\n\nUne nouvelle tâche a été assignée dans le projet \"%s\".\n\n" +
-                        "Titre de la tâche : %s\nDescription : %s\nDate d'échéance : %s\n\n" +
-                        "Cordialement,\nL'équipe PMT",
+        String content = String.format("""
+    <html>
+        <body>
+            <p>Bonjour,</p>
+            <p>Une nouvelle tâche a été assignée dans le projet <strong>%s</strong>.</p>
+            <p>
+                <strong>Titre de la tâche :</strong> %s<br>
+                <strong>Description :</strong> %s<br>
+                <strong>Date d'échéance :</strong> %s
+            </p>
+            <p>Cordialement,<br>L'équipe PMT</p>
+        </body>
+    </html>
+    """,
                 task.getProject().getName(),
                 task.getTitle(),
                 task.getDescription(),
