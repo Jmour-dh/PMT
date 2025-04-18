@@ -25,6 +25,7 @@ public class TaskService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final EmailService emailService;
+    private final TaskHistoryService taskHistoryService;
 
     @Transactional
     public TaskDto createTask(TaskDto taskDto) {
@@ -71,18 +72,41 @@ public class TaskService {
 
         validateUserPermission(currentUser, task.getProject());
 
-        if (taskDto.getTitle() != null) task.setTitle(taskDto.getTitle());
-        if (taskDto.getDescription() != null) task.setDescription(taskDto.getDescription());
-        if (taskDto.getDueDate() != null) task.setDueDate(taskDto.getDueDate());
-        if (taskDto.getPriority() != null) task.setPriority(taskDto.getPriority());
-        if (taskDto.getStatus() != null) task.setStatus(taskDto.getStatus());
-
+        if (taskDto.getTitle() != null && !taskDto.getTitle().equals(task.getTitle())) {
+            taskHistoryService.logTaskChange(task, "title", task.getTitle(), taskDto.getTitle(), currentUser);
+            task.setTitle(taskDto.getTitle());
+        }
+        if (taskDto.getDescription() != null && !taskDto.getDescription().equals(task.getDescription())) {
+            taskHistoryService.logTaskChange(task, "description", task.getDescription(), taskDto.getDescription(), currentUser);
+            task.setDescription(taskDto.getDescription());
+        }
+        if (taskDto.getDueDate() != null && !taskDto.getDueDate().equals(task.getDueDate())) {
+            taskHistoryService.logTaskChange(task, "dueDate", task.getDueDate() != null ? task.getDueDate().toString() : null, taskDto.getDueDate().toString(), currentUser);
+            task.setDueDate(taskDto.getDueDate());
+        }
+        if (taskDto.getPriority() != null && !taskDto.getPriority().equals(task.getPriority())) {
+            taskHistoryService.logTaskChange(
+                    task,
+                    "priority",
+                    task.getPriority() != null ? task.getPriority().toString() : null,
+                    taskDto.getPriority().toString(),
+                    currentUser
+            );
+            task.setPriority(taskDto.getPriority());
+        }
+        if (taskDto.getStatus() != null && !taskDto.getStatus().equals(task.getStatus())) {
+            taskHistoryService.logTaskChange(task, "status", task.getStatus().toString(), taskDto.getStatus().toString(), currentUser);
+            task.setStatus(taskDto.getStatus());
+        }
         if (taskDto.getAssigneeId() != null) {
             User assignee = userRepository.findById(taskDto.getAssigneeId())
                     .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + taskDto.getAssigneeId()));
 
             validateAssigneeIsProjectMember(assignee, task.getProject());
-            task.setAssignee(assignee);
+            if (task.getAssignee() == null || !task.getAssignee().getId().equals(assignee.getId())) {
+                taskHistoryService.logTaskChange(task, "assignee", task.getAssignee() != null ? task.getAssignee().getId().toString() : null, assignee.getId().toString(), currentUser);
+                task.setAssignee(assignee);
+            }
         }
 
         Task updatedTask = taskRepository.save(task);

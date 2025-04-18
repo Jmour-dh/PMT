@@ -1,6 +1,7 @@
 package com.PMT.Backend_PMT.dto;
 
 import com.PMT.Backend_PMT.entity.Project;
+import com.PMT.Backend_PMT.entity.Task;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -31,6 +32,8 @@ public class ProjectDto {
 
     private List<ProjectMemberDto> members;
 
+    private List<TaskDto> tasks;
+
     public ProjectDto(Project project) {
         this.id = project.getId();
         this.name = project.getName();
@@ -43,6 +46,19 @@ public class ProjectDto {
                         member.getUser().getId(),
                         member.getUser().getUsername(),
                         member.getRole()))
+                .toList();
+        this.tasks = project.getTasks()
+                .stream()
+                .map(task -> new TaskDto(
+                        task.getId(),
+                        task.getTitle(),
+                        task.getDescription(),
+                        task.getDueDate(),
+                        task.getPriority(),
+                        task.getStatus(),
+                        task.getCreatedBy().getId(),
+                        task.getAssignee() != null ? task.getAssignee().getId() : null,
+                        task.getProject().getId()))
                 .toList();
     }
 }

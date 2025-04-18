@@ -21,7 +21,8 @@ public class UserDetailsDto {
     private String email;
     private LocalDateTime createdAt;
     private List<ProjectDto> createdProjects;
-    private List<ProjectDto> memberProjects; // Nouvel attribut
+    private List<ProjectDto> memberProjects;
+    private List<TaskDto> assignedTasks;
 
     public UserDetailsDto(User user) {
         this.id = user.getId();
@@ -32,9 +33,13 @@ public class UserDetailsDto {
                 .stream()
                 .map(ProjectDto::new)
                 .collect(Collectors.toList());
-        this.memberProjects = user.getProjectMemberships() // Récupère les projets où l'utilisateur est membre
+        this.memberProjects = user.getProjectMemberships()
                 .stream()
                 .map(pm -> new ProjectDto(pm.getProject()))
+                .collect(Collectors.toList());
+        this.assignedTasks = user.getAssignedTasks()
+                .stream()
+                .map(TaskDto::new)
                 .collect(Collectors.toList());
     }
 }
