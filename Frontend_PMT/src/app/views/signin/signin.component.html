@@ -1,0 +1,70 @@
+<div class="signin-page">
+  <div class="background-design">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+  </div>
+  
+  <div class="signin-container">
+    <div class="signin-card">
+      <h2>Connexion</h2>
+      <form (ngSubmit)="onSignIn()" #signinForm="ngForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            [(ngModel)]="credentials.email"
+            required
+            email
+            #email="ngModel"
+            [ngClass]="{'is-invalid': email.invalid && email.touched}"
+            [disabled]="isLoading"
+            placeholder="Entrez votre email"
+          >
+          <div class="invalid-feedback" *ngIf="email.invalid && email.touched">
+            Veuillez entrer une adresse email valide
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            [(ngModel)]="credentials.password"
+            required
+            minlength="6"
+            #password="ngModel"
+            [ngClass]="{'is-invalid': password.invalid && password.touched}"
+            [disabled]="isLoading"
+            placeholder="Entrez votre mot de passe"
+          >
+          <div class="invalid-feedback" *ngIf="password.invalid && password.touched">
+            Le mot de passe doit contenir au moins 6 caractères
+          </div>
+        </div>
+
+        <div class="error-message" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+        
+        <button 
+          type="submit" 
+          [disabled]="signinForm.invalid || isLoading"
+          class="btn btn-primary"
+        >
+          <span *ngIf="!isLoading">Se connecter</span>
+          <span *ngIf="isLoading">Connexion en cours...</span>
+        </button>
+
+        <div class="signup-link">
+          <p>Vous n'avez pas de compte ?</p>
+          <a routerLink="/signup">Créer votre compte</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

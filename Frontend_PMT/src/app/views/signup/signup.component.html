@@ -1,0 +1,81 @@
+<div class="signup-page">
+  <div class="background-design">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+  </div>
+  
+  <div class="signup-container">
+    <div class="signup-card">
+      <h2>Créer un compte</h2>
+      
+      <form #signupForm="ngForm" (ngSubmit)="onSignUp()">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            [(ngModel)]="credentials.email" 
+            required
+            email
+            placeholder="Entrez votre email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="username">Nom d'utilisateur</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            [(ngModel)]="credentials.username" 
+            required
+            placeholder="Choisissez un nom d'utilisateur"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            [(ngModel)]="credentials.password" 
+            required
+            minlength="6"
+            placeholder="Créez un mot de passe"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmer le mot de passe</label>
+          <input 
+            type="password" 
+            id="confirmPassword" 
+            name="confirmPassword" 
+            [(ngModel)]="credentials.confirmPassword" 
+            required
+            placeholder="Confirmez votre mot de passe"
+          >
+        </div>
+
+        <div class="error-message" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="!signupForm.valid || isLoading"
+          class="submit-button"
+        >
+          {{ isLoading ? 'Création en cours...' : 'Créer un compte' }}
+        </button>
+      </form>
+
+      <div class="signin-link">
+        <p>Vous avez déjà un compte ? <a routerLink="/signin">Se connecter</a></p>
+      </div>
+    </div>
+  </div>
+</div>

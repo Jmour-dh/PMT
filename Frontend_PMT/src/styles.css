@@ -1,0 +1,10 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+  box-sizing: border-box;
+}
+
+.flex-auto {
+flex: 1 1 auto;
+}
