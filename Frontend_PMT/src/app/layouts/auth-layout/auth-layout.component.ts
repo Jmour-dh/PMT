@@ -11,8 +11,21 @@ import { RouterOutlet } from '@angular/router';
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
     .auth-layout {
-      min-height: 100vh;
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;

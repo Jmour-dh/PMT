@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
@@ -20,7 +20,6 @@ export class SigninComponent {
   isLoading = false;
 
   constructor(
-    private router: Router,
     private authService: AuthService
   ) {}
 
