@@ -12,8 +12,6 @@ export interface Project {
   id: number;
   name: string;
   description: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface Task {
@@ -21,7 +19,5 @@ export interface Task {
   title: string;
   description: string;
   status: 'TODO' | 'IN_PROGRESS' | 'DONE';
-  createdAt: string;
-  updatedAt: string;
   project: Project;
 } 
