@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../models/user.model';
 
@@ -17,5 +17,17 @@ export class UserService {
       'Authorization': `Bearer ${token}`
     });
     return this.http.get<User>(`/api/users/me`, { headers });
+  }
+
+  updateUserProfile(userId: string, data: { email?: string; username?: string }): Observable<HttpResponse<any>> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.put<any>(`/api/users/${userId}`, data, { 
+      headers,
+      observe: 'response' // Cela nous permettra de voir la réponse complète, même si elle est vide
+    });
   }
 }

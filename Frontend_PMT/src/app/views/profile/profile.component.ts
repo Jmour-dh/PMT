@@ -1,14 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { User, Project, Task } from '../../models/user.model';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="profile-wrapper">
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Chargement en cours...</p>
+      </div>
+
       <div class="profile-sidebar">
         <div class="user-card">
           <div class="user-avatar">
@@ -34,6 +41,54 @@ import { User, Project, Task } from '../../models/user.model';
               Membre depuis {{ userProfile?.createdAt | date:'dd/MM/yyyy' }}
             </div>
           </div>
+        </div>
+
+        <!-- Profile Edit Form -->
+        <div class="profile-edit-section">
+          <h3>Modifier le profil</h3>
+          <form (ngSubmit)="onSubmit()" #profileForm="ngForm">
+            <div class="form-group">
+              <label for="username">Nom d'utilisateur</label>
+              <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                [(ngModel)]="editForm.username" 
+                class="form-control"
+                placeholder="Nouveau nom d'utilisateur"
+                (input)="checkFormChanges()"
+              >
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                [(ngModel)]="editForm.email" 
+                class="form-control"
+                placeholder="Nouvel email"
+                (input)="checkFormChanges()"
+              >
+            </div>
+            <button 
+              type="submit" 
+              class="btn-save" 
+              [disabled]="!profileForm.form.valid || isUpdating || !hasChanges"
+            >
+              <span *ngIf="!isUpdating">Enregistrer</span>
+              <span *ngIf="isUpdating">
+                <span class="button-spinner"></span>
+                Enregistrement...
+              </span>
+            </button>
+            <div *ngIf="updateError" class="error-message">
+              {{ updateError }}
+            </div>
+            <div *ngIf="updateSuccess" class="success-message">
+              Profil mis à jour avec succès
+            </div>
+          </form>
         </div>
       </div>
 
@@ -317,6 +372,136 @@ import { User, Project, Task } from '../../models/user.model';
       margin: 0;
     }
 
+    .profile-edit-section {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .profile-edit-section h3 {
+      font-size: 1.2rem;
+      color: #2d3748;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #4a5568;
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn-save {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-save:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #a0aec0;
+    }
+
+    .btn-save:hover:not(:disabled) {
+      opacity: 0.9;
+    }
+
+    .error-message {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background-color: #fff5f5;
+      color: #c53030;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .success-message {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background-color: #f0fff4;
+      color: #2f855a;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    .loading-overlay p {
+      color: #2d3748;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .button-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ffffff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
       .profile-wrapper {
         flex-direction: column;
@@ -336,11 +521,28 @@ import { User, Project, Task } from '../../models/user.model';
       .content-wrapper {
         max-width: 100%;
       }
+
+      .profile-edit-section {
+        margin-top: 1rem;
+      }
     }
   `]
 })
 export class ProfileComponent implements OnInit {
   userProfile: User | null = null;
+  isLoading = true;
+  editForm = {
+    username: '',
+    email: ''
+  };
+  initialFormValues = {
+    username: '',
+    email: ''
+  };
+  hasChanges = false;
+  isUpdating = false;
+  updateError: string | null = null;
+  updateSuccess = false;
 
   constructor(private userService: UserService) {}
 
@@ -349,11 +551,109 @@ export class ProfileComponent implements OnInit {
       next: (response) => {
         console.log('Réponse complète:', response);
         this.userProfile = response;
+        // Initialize form with current values
+        this.editForm.username = response.username;
+        this.editForm.email = response.email;
+        // Save initial values
+        this.initialFormValues = { ...this.editForm };
+        this.isLoading = false;
         console.log('Projets:', this.userProfile?.memberProjects);
         console.log('Tâches assignées:', this.userProfile?.assignedTasks);
       },
       error: (error) => {
         console.error('Erreur lors de la requête /me:', error);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  checkFormChanges() {
+    this.hasChanges = 
+      this.editForm.username !== this.initialFormValues.username ||
+      this.editForm.email !== this.initialFormValues.email;
+  }
+
+  onSubmit() {
+    if (!this.userProfile?.id) return;
+
+    this.isUpdating = true;
+    this.updateError = null;
+    this.updateSuccess = false;
+
+    this.userService.updateUserProfile(this.userProfile.id.toString(), this.editForm).subscribe({
+      next: (response) => {
+        if (response.status === 200) {
+          this.updateSuccess = true;
+          this.isUpdating = false;
+          
+          // Update initial values after successful save
+          this.initialFormValues = { ...this.editForm };
+          this.hasChanges = false;
+          
+          // Rafraîchir les données du profil
+          this.userService.getUserProfile().subscribe({
+            next: (updatedProfile) => {
+              this.userProfile = updatedProfile;
+              this.editForm.username = updatedProfile.username;
+              this.editForm.email = updatedProfile.email;
+            },
+            error: (error) => {
+              console.error('Erreur lors du rafraîchissement du profil:', error);
+            }
+          });
+        }
+      },
+      error: (error) => {
+        if (error.status === 200) {
+          this.updateSuccess = true;
+          this.isUpdating = false;
+          
+          // Update initial values after successful save
+          this.initialFormValues = { ...this.editForm };
+          this.hasChanges = false;
+          
+          // Rafraîchir les données du profil
+          this.userService.getUserProfile().subscribe({
+            next: (updatedProfile) => {
+              this.userProfile = updatedProfile;
+              this.editForm.username = updatedProfile.username;
+              this.editForm.email = updatedProfile.email;
+            },
+            error: (error) => {
+              console.error('Erreur lors du rafraîchissement du profil:', error);
+            }
+          });
+        } else {
+          console.error('Détails de l\'erreur:', error);
+          
+          // Gestion des erreurs spécifiques
+          if (error.status === 400) {
+            const errorMessage = error.error?.message || error.error;
+            if (typeof errorMessage === 'string') {
+              if (errorMessage.includes('email')) {
+                this.updateError = 'Cette adresse email est déjà utilisée. Veuillez en choisir une autre.';
+              } else if (errorMessage.includes('username')) {
+                this.updateError = 'Ce nom d\'utilisateur est déjà pris. Veuillez en choisir un autre.';
+              } else {
+                this.updateError = 'Les données saisies ne sont pas valides. Veuillez vérifier vos informations.';
+              }
+            } else {
+              this.updateError = 'Les données saisies ne sont pas valides. Veuillez vérifier vos informations.';
+            }
+          } else if (error.status === 401) {
+            this.updateError = 'Votre session a expiré. Veuillez vous reconnecter.';
+          } else if (error.status === 403) {
+            this.updateError = 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action.';
+          } else if (error.status === 404) {
+            this.updateError = 'Le profil n\'a pas été trouvé.';
+          } else if (error.status >= 500) {
+            this.updateError = 'Une erreur serveur est survenue. Veuillez réessayer plus tard.';
+          } else {
+            this.updateError = 'Une erreur inattendue est survenue. Veuillez réessayer.';
+          }
+          
+          this.isUpdating = false;
+        }
       }
     });
   }
