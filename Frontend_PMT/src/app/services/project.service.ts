@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { formatDate } from '@angular/common';
 
 export enum TaskPriority {
   LOW = 'LOW',
@@ -42,7 +43,7 @@ export interface Project {
   id: number;
   name: string;
   description: string;
-  startDate: string;
+  startDate: string; 
   createdById: number;
   members: ProjectMember[];
   tasks: Task[];
@@ -60,7 +61,7 @@ export class ProjectService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
-    return this.http.get<Project[]>('api/projects/', { headers });
+    return this.http.get<Project[]>('/api/projects/', { headers });
   }
 
   getProjectById(id: number): Observable<Project> {
@@ -69,6 +70,21 @@ export class ProjectService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
-    return this.http.get<Project>(`api/projects/${id}`, { headers });
+    return this.http.get<Project>(`/api/projects/${id}`, { headers });
+  }
+
+  createProject(project: any): Observable<Project> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    const formattedProject = {
+      ...project,
+      startDate: formatDate(project.startDate, 'yyyy-MM-dd', 'fr-FR')
+    };
+
+    return this.http.post<Project>('/api/projects/', formattedProject, { headers });
   }
 } 

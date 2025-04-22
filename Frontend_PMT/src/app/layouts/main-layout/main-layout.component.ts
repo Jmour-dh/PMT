@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 
@@ -9,7 +9,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
   imports: [RouterOutlet, HeaderComponent, FooterComponent],
   template: `
     <div class="main-layout">
-      <app-header></app-header>
+      <app-header (projectCreated)="onProjectCreated()"></app-header>
       <main class="content">
         <router-outlet></router-outlet>
       </main>
@@ -28,4 +28,14 @@ import { FooterComponent } from '../../components/footer/footer.component';
     }
   `]
 })
-export class MainLayoutComponent {} 
+export class MainLayoutComponent {
+  constructor(private router: Router) {}
+
+  onProjectCreated() {
+    // Rafraîchir la page actuelle
+    const currentUrl = this.router.url;
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate([currentUrl]);
+    });
+  }
+} 

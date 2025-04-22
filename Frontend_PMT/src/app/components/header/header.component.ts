@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { CreateProjectModalComponent } from '../create-project-modal/create-project-modal.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CreateProjectModalComponent],
   template: `
     <header class="header">
       <div class="header-container">
@@ -14,6 +15,10 @@ import { CommonModule } from '@angular/common';
           <h1>PMT</h1>
         </div>
         <nav class="nav-menu">
+          <button class="nav-btn create-project" (click)="openCreateProjectModal()">
+            <i class="fas fa-plus"></i>
+            <span class="btn-text">Créer un projet</span>
+          </button>
           <button class="nav-btn" (click)="goToProfile()">
             <i class="fas fa-user"></i>
             <span class="btn-text">Mon compte</span>
@@ -25,6 +30,12 @@ import { CommonModule } from '@angular/common';
         </nav>
       </div>
     </header>
+
+    <app-create-project-modal 
+      *ngIf="showCreateProjectModal" 
+      (close)="closeCreateProjectModal()"
+      (projectCreated)="onProjectCreated()"
+    ></app-create-project-modal>
   `,
   styles: [`
     .header {
@@ -81,6 +92,18 @@ import { CommonModule } from '@angular/common';
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
+    .nav-btn.create-project {
+      background-color: #28a745;
+      color: white;
+      border: none;
+    }
+
+    .nav-btn.create-project:hover {
+      background-color: #218838;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
     .nav-btn.logout {
       background-color: #dc3545;
       color: white;
@@ -127,10 +150,25 @@ import { CommonModule } from '@angular/common';
   `]
 })
 export class HeaderComponent {
+  @Output() projectCreated = new EventEmitter<void>();
+  showCreateProjectModal = false;
+
   constructor(
     private router: Router,
     private authService: AuthService
   ) {}
+
+  openCreateProjectModal() {
+    this.showCreateProjectModal = true;
+  }
+
+  closeCreateProjectModal() {
+    this.showCreateProjectModal = false;
+  }
+
+  onProjectCreated() {
+    this.projectCreated.emit();
+  }
 
   goToDashboard() {
     this.router.navigate(['/dashboard']);

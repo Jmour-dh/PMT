@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ProjectService, Project } from '../../services/project.service';
 import { UserService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,11 +12,16 @@ import { RouterModule } from '@angular/router';
     <div class="dashboard-container">
       <h1 class="dashboard-title">Tableau de bord des projets</h1>
       
-      <div *ngIf="projects.length === 0" class="no-projects">
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Chargement des projets...</p>
+      </div>
+      
+      <div *ngIf="!isLoading && projects.length === 0" class="no-projects">
         <p>Aucun projet n'est disponible pour le moment.</p>
       </div>
       
-      <div class="projects-grid" *ngIf="projects.length > 0">
+      <div class="projects-grid" *ngIf="!isLoading && projects.length > 0">
         <div *ngFor="let project of projects" class="project-card">
           <div class="project-header">
             <h2 class="project-name">{{ project.name }}</h2>
@@ -40,7 +45,9 @@ import { RouterModule } from '@angular/router';
           </div>
           
           <div class="project-actions">
-            <a *ngIf="isUserMemberOfProject(project)" [routerLink]="['/projects', project.id]" class="details-link">
+            <a *ngIf="isUserMemberOfProject(project)" 
+               [routerLink]="['/projects', project.id]"
+               class="details-link">
               Voir les détails
             </a>
           </div>
@@ -62,6 +69,37 @@ import { RouterModule } from '@angular/router';
       font-weight: bold;
       margin-bottom: 2rem;
       color: #333;
+    }
+
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-container p {
+      color: #666;
+      font-size: 1.1rem;
     }
 
     .no-projects {
@@ -97,50 +135,24 @@ import { RouterModule } from '@angular/router';
     }
 
     .project-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
       margin-bottom: 1rem;
     }
 
     .project-name {
-      font-size: 1.25rem;
-      font-weight: 600;
+      font-size: 1.5rem;
       color: #2c3e50;
       margin: 0;
     }
 
-    .project-status {
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-
-    .status-in-progress {
-      background-color: #e6f4ea;
-      color: #1e7e34;
-    }
-
-    .status-planned {
-      background-color: #e3f2fd;
-      color: #0d47a1;
-    }
-
-    .status-completed {
-      background-color: #f5f5f5;
-      color: #616161;
-    }
-
     .project-description {
       color: #666;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       line-height: 1.5;
     }
 
     .project-info {
       display: flex;
-      justify-content: space-between;
+      gap: 2rem;
       margin-bottom: 1rem;
     }
 
@@ -148,12 +160,12 @@ import { RouterModule } from '@angular/router';
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.25rem;
     }
 
     .info-label {
       font-size: 0.875rem;
       color: #666;
+      margin-bottom: 0.25rem;
     }
 
     .info-value {
@@ -163,8 +175,6 @@ import { RouterModule } from '@angular/router';
     }
 
     .project-dates {
-      display: flex;
-      justify-content: space-between;
       font-size: 0.875rem;
       color: #666;
       margin-bottom: 1rem;
@@ -172,6 +182,8 @@ import { RouterModule } from '@angular/router';
 
     .project-actions {
       margin-top: 1rem;
+      display: flex;
+      justify-content: flex-end;
     }
 
     .details-link {
@@ -190,6 +202,11 @@ import { RouterModule } from '@angular/router';
         padding: 1rem;
       }
 
+      .dashboard-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
       .projects-grid {
         grid-template-columns: 1fr;
       }
@@ -199,28 +216,28 @@ import { RouterModule } from '@angular/router';
 export class DashboardComponent implements OnInit {
   projects: Project[] = [];
   userProjectIds: number[] = [];
+  isLoading = true;
 
   constructor(
     private projectService: ProjectService,
-    private userService: UserService
+    private userService: UserService,
   ) {
-    console.log('DashboardComponent initialized');
   }
 
   ngOnInit(): void {
-    console.log('ngOnInit called');
     this.loadProjects();
     this.loadUserProjects();
   }
 
   loadProjects(): void {
-    console.log('Loading projects...');
+    this.isLoading = true;
     this.projectService.getAllProjects().subscribe({
       next: (projects: Project[]) => {
         this.projects = projects;
+        this.isLoading = false;
       },
       error: (error: any) => {
-        console.error('Error loading projects:', error);
+        this.isLoading = false;
       }
     });
   }
@@ -237,6 +254,12 @@ export class DashboardComponent implements OnInit {
   }
 
   isUserMemberOfProject(project: Project): boolean {
-    return this.userProjectIds.includes(project.id);
+    const isMember = this.userProjectIds.includes(project.id);
+    return isMember;
+  }
+
+  refreshProjects(): void {
+    this.loadProjects();
+    this.loadUserProjects();
   }
 }
