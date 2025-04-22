@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { ProjectService, Project, ProjectMember } from '../../services/project.service';
+import { ProjectService, Project, ProjectMember, Role } from '../../services/project.service';
+import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-project-details',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   template: `
     <div class="project-details-container">
       <div *ngIf="isLoading" class="loading-overlay">
@@ -30,11 +33,11 @@ import { CommonModule } from '@angular/common';
               </div>
               <div class="info-item">
                 <span class="info-label">Nombre de membres</span>
-                <span class="info-value">{{ project.members?.length || 0 }}</span>
+                <span class="info-value">{{ project.members.length || 0 }}</span>
               </div>
               <div class="info-item">
                 <span class="info-label">Nombre total de tâches</span>
-                <span class="info-value">{{ project.tasks?.length || 0 }}</span>
+                <span class="info-value">{{ project.tasks.length || 0 }}</span>
               </div>
             </div>
           </div>
@@ -44,7 +47,7 @@ import { CommonModule } from '@angular/common';
             <div class="members-list">
               <div *ngFor="let member of project.members" class="member-card">
                 <div class="member-avatar">
-                  {{ member.username?.charAt(0)?.toUpperCase() }}
+                  {{ member.username.charAt(0).toUpperCase() }}
                 </div>
                 <div class="member-info">
                   <span class="member-name">{{ member.username }}</span>
@@ -132,6 +135,69 @@ import { CommonModule } from '@angular/common';
 
       <div *ngIf="!isLoading && !project" class="error-message">
         <p>Projet non trouvé</p>
+      </div>
+
+      <div class="fab-container" *ngIf="!isObserver">
+        <div class="fab-menu" [class.open]="isFabOpen">
+          <button class="fab-item" (click)="openInviteMember()">
+            <span class="fab-icon">👥</span>
+            <span class="fab-label">Inviter un membre</span>
+          </button>
+          <button class="fab-item" (click)="openCreateTask()">
+            <span class="fab-icon">➕</span>
+            <span class="fab-label">Créer une tâche</span>
+          </button>
+        </div>
+        <button class="fab-button" (click)="toggleFab()">
+          <span class="fab-icon">⚙️</span>
+        </button>
+      </div>
+
+      <!-- Toast de succès -->
+      <div class="toast" *ngIf="showSuccessToast" [@fadeInOut]>
+        <span class="toast-icon">✅</span>
+        <span class="toast-message">Invitation envoyée avec succès</span>
+      </div>
+
+      <!-- Modal d'invitation -->
+      <div class="modal-overlay" *ngIf="showInviteModal" (click)="closeInviteModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <h2>Inviter un membre</h2>
+          <form (ngSubmit)="submitInvitation()">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input 
+                type="email" 
+                id="email" 
+                [(ngModel)]="inviteEmail" 
+                name="email" 
+                required
+                placeholder="Entrez l'email du membre"
+                [class.error]="errorMessage"
+              >
+            </div>
+            <div class="form-group">
+              <label for="role">Rôle</label>
+              <select 
+                id="role" 
+                [(ngModel)]="selectedRole" 
+                name="role" 
+                required
+              >
+                <option *ngFor="let role of roles" [value]="role">
+                  {{ role }}
+                </option>
+              </select>
+            </div>
+            <div class="error-message" *ngIf="errorMessage">
+              {{ errorMessage }}
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="cancel-btn" (click)="closeInviteModal()">Annuler</button>
+              <button type="submit" class="submit-btn">Inviter</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   `,
@@ -386,6 +452,198 @@ import { CommonModule } from '@angular/common';
         grid-template-columns: 1fr;
       }
     }
+
+    .fab-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .fab-button {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: #667eea;
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .fab-button:hover {
+      transform: scale(1.1);
+    }
+
+    .fab-menu {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .fab-menu.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .fab-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      background-color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .fab-item:hover {
+      transform: translateX(-5px);
+    }
+
+    .fab-icon {
+      font-size: 20px;
+    }
+
+    .fab-label {
+      font-size: 14px;
+      color: #2c3e50;
+    }
+
+    /* Styles pour la modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-content h2 {
+      margin-bottom: 1.5rem;
+      color: #2c3e50;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #2c3e50;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .cancel-btn {
+      padding: 0.75rem 1.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      color: #2c3e50;
+      cursor: pointer;
+    }
+
+    .submit-btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      background: #667eea;
+      color: white;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover {
+      background: #5a67d8;
+    }
+
+    /* Styles pour le toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      z-index: 1001;
+      animation: fadeInOut 3s ease-in-out;
+    }
+
+    .toast-icon {
+      font-size: 18px;
+    }
+
+    .toast-message {
+      font-size: 14px;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(20px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(20px); }
+    }
+
+    /* Styles pour le message d'erreur */
+    .error-message {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+    }
+
+    .form-group input.error {
+      border-color: #dc3545;
+    }
   `]
 })
 export class ProjectDetailsComponent implements OnInit {
@@ -394,10 +652,20 @@ export class ProjectDetailsComponent implements OnInit {
   todoTasks: any[] = [];
   inProgressTasks: any[] = [];
   doneTasks: any[] = [];
+  isFabOpen = false;
+  isObserver = false;
+  showInviteModal = false;
+  inviteEmail = '';
+  selectedRole: Role = Role.MEMBER;
+  roles = Object.values(Role);
+  showSuccessToast = false;
+  errorMessage = '';
 
   constructor(
     private route: ActivatedRoute,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private authService: AuthService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -419,6 +687,7 @@ export class ProjectDetailsComponent implements OnInit {
         console.log('Project details loaded:', project);
         this.project = project;
         this.categorizeTasks(project.tasks || []);
+        this.checkUserRole();
         this.isLoading = false;
       },
       error: (error) => {
@@ -443,5 +712,84 @@ export class ProjectDetailsComponent implements OnInit {
     if (!this.project?.members) return 'Inconnu';
     const member = this.project.members.find(m => m.userId === userId);
     return member?.username || 'Inconnu';
+  }
+
+  toggleFab() {
+    this.isFabOpen = !this.isFabOpen;
+  }
+
+  openCreateTask() {
+    // TODO: Implement create task functionality
+    console.log('Open create task dialog');
+  }
+
+  openInviteMember() {
+    this.showInviteModal = true;
+  }
+
+  closeInviteModal() {
+    this.showInviteModal = false;
+    this.inviteEmail = '';
+    this.selectedRole = Role.MEMBER;
+    this.errorMessage = '';
+  }
+
+  showToast() {
+    this.showSuccessToast = true;
+    setTimeout(() => {
+      this.showSuccessToast = false;
+    }, 3000);
+  }
+
+  submitInvitation() {
+    if (!this.project) return;
+    this.errorMessage = '';
+
+    const token = localStorage.getItem('token');
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+
+    const body = {
+      email: this.inviteEmail,
+      role: this.selectedRole
+    };
+
+    this.http.post(
+      `/api/projects/${this.project.id}/invite`,
+      body,
+      { headers }
+    ).subscribe({
+      next: () => {
+        this.showToast();
+        this.closeInviteModal();
+        this.loadProjectDetails(this.project!.id);
+      },
+      error: (error) => {
+        console.error('Erreur lors de l\'envoi de l\'invitation:', error);
+        
+        switch (error.status) {
+          case 409:
+            this.errorMessage = 'Cet utilisateur est déjà membre du projet';
+            break;
+          case 400:
+            this.errorMessage = 'Cet utilisateur n\'existe pas dans le système';
+            break;
+          default:
+            this.errorMessage = error.error?.message || 'Une erreur est survenue lors de l\'envoi de l\'invitation';
+        }
+      }
+    });
+  }
+
+  checkUserRole(): void {
+    if (this.project && this.project.members) {
+      const currentUserId = this.authService.getCurrentUserId();
+      const currentUser = this.project.members.find(member => 
+        member.userId === currentUserId
+      );
+      this.isObserver = currentUser?.role === 'OBSERVER';
+    }
   }
 } 

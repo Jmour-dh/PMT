@@ -29,6 +29,7 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<string> {
+    console.log('URL de connexion:', `${this.environmentService.getApiUrl()}/auth/login`);
     return this.http.post(
       `${this.environmentService.getApiUrl()}/auth/login`, 
       { email, password },
@@ -44,6 +45,7 @@ export class AuthService {
   }
 
   handleLoginSuccess(token: string) {
+    console.log('Traitement du token:', token);
     localStorage.setItem('token', token);
     this.isAuthenticatedSubject.next(true);
     this.router.navigate(['/dashboard']);
@@ -53,5 +55,18 @@ export class AuthService {
     localStorage.removeItem('token');
     this.isAuthenticatedSubject.next(false);
     this.router.navigate(['/signin']);
+  }
+
+  getCurrentUserId(): number | null {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.userId;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
   }
 } 

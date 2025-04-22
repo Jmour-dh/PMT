@@ -32,11 +32,11 @@ import { RouterModule, Router } from '@angular/router';
           <div class="project-info">
             <div class="info-item">
               <span class="info-label">Membres</span>
-              <span class="info-value">{{ project.members?.length || 0 }}</span>
+              <span class="info-value">{{ project.members.length || 0 }}</span>
             </div>
             <div class="info-item">
               <span class="info-label">Tâches</span>
-              <span class="info-value">{{ project.tasks?.length || 0 }}</span>
+              <span class="info-value">{{ project.tasks.length || 0 }}</span>
             </div>
           </div>
           

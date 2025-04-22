@@ -28,14 +28,18 @@ export class SigninComponent {
     
     this.isLoading = true;
     this.errorMessage = '';
+    console.log('Tentative de connexion avec:', this.credentials);
 
     this.authService.login(this.credentials.email, this.credentials.password)
       .subscribe({
         next: (token) => {
+          console.log('Token reçu:', token);
+          this.errorMessage = '';
           this.authService.handleLoginSuccess(token);
           this.isLoading = false;
         },
-        error: () => {
+        error: (error) => {
+          console.error('Erreur détaillée:', error);
           this.isLoading = false;
           this.errorMessage = 'Email ou mot de passe incorrect';
         }
