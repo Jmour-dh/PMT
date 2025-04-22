@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ProjectService, Project } from '../../services/project.service';
+import { UserService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -39,7 +40,7 @@ import { RouterModule } from '@angular/router';
           </div>
           
           <div class="project-actions">
-            <a [routerLink]="['/projects', project.id]" class="details-link">
+            <a *ngIf="isUserMemberOfProject(project)" [routerLink]="['/projects', project.id]" class="details-link">
               Voir les détails
             </a>
           </div>
@@ -197,14 +198,19 @@ import { RouterModule } from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
   projects: Project[] = [];
+  userProjectIds: number[] = [];
 
-  constructor(private projectService: ProjectService) {
+  constructor(
+    private projectService: ProjectService,
+    private userService: UserService
+  ) {
     console.log('DashboardComponent initialized');
   }
 
   ngOnInit(): void {
     console.log('ngOnInit called');
     this.loadProjects();
+    this.loadUserProjects();
   }
 
   loadProjects(): void {
@@ -219,4 +225,18 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  loadUserProjects(): void {
+    this.userService.getUserProfile().subscribe({
+      next: (user) => {
+        this.userProjectIds = user.memberProjects?.map(p => p.id) || [];
+      },
+      error: (error) => {
+        console.error('Error loading user projects:', error);
+      }
+    });
+  }
+
+  isUserMemberOfProject(project: Project): boolean {
+    return this.userProjectIds.includes(project.id);
+  }
 }
