@@ -6,11 +6,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../services/user.service';
+import { CreateTaskModalComponent } from '../../components/cretae-task-modal/cretae-task-modal.component';
 
 @Component({
   selector: 'app-project-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule,
+    CreateTaskModalComponent,
+  ],
   template: `
     <div class="project-details-container">
       <div *ngIf="isLoading" class="loading-overlay">
@@ -145,7 +148,7 @@ import { UserService } from '../../services/user.service';
         <span class="fab-icon">👥</span>
         <span class="fab-label">Inviter un membre</span>
       </button>
-      <button class="fab-item" (click)="openCreateTask()">
+      <button class="fab-item" (click)="openCreateTaskModal()">
         <span class="fab-icon">➕</span>
         <span class="fab-label">Créer une tâche</span>
       </button>
@@ -156,6 +159,12 @@ import { UserService } from '../../services/user.service';
   </div>
 </div>
 
+<!-- Modal de création de tâche -->
+<app-create-task-modal
+  *ngIf="showCreateTaskModal"
+  (close)="closeCreateTaskModal()"
+  (taskCreated)="loadProjectDetails(project!.id)"
+></app-create-task-modal>
 
       <div class="toast" *ngIf="showSuccessToast" [@fadeInOut]>
         <span class="toast-icon">✅</span>
@@ -663,6 +672,7 @@ export class ProjectDetailsComponent implements OnInit {
   roles = Object.values(Role);
   showSuccessToast = false;
   errorMessage = '';
+  showCreateTaskModal = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -681,8 +691,9 @@ export class ProjectDetailsComponent implements OnInit {
     }
   }
 
-  loadProjectDetails(projectId: number): void {
+  loadProjectDetails(projectId: number ): void {
     this.isLoading = true;
+    setTimeout(() => {
     this.projectService.getProjectById(projectId).subscribe({
       next: (project) => {
         this.project = project;
@@ -695,6 +706,7 @@ export class ProjectDetailsComponent implements OnInit {
         this.isLoading = false;
       }
     });
+    }, 400); 
   }
 
   categorizeTasks(tasks: any[]): void {
@@ -793,5 +805,14 @@ export class ProjectDetailsComponent implements OnInit {
         this.isLoading = false; // Désactive le spinner en cas d'erreur
       }
     });
+  }
+
+  openCreateTaskModal(): void {
+    this.showCreateTaskModal = true;
+  }
+  
+  closeCreateTaskModal(): void {
+    this.showCreateTaskModal = false;
+    this.isFabOpen = false; 
   }
 } 
