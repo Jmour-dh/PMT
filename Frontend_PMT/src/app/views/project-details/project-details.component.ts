@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-project-details',
@@ -137,29 +138,31 @@ import { HttpClient } from '@angular/common/http';
         <p>Projet non trouvé</p>
       </div>
 
-      <div class="fab-container" *ngIf="!isObserver">
-        <div class="fab-menu" [class.open]="isFabOpen">
-          <button class="fab-item" (click)="openInviteMember()">
-            <span class="fab-icon">👥</span>
-            <span class="fab-label">Inviter un membre</span>
-          </button>
-          <button class="fab-item" (click)="openCreateTask()">
-            <span class="fab-icon">➕</span>
-            <span class="fab-label">Créer une tâche</span>
-          </button>
-        </div>
-        <button class="fab-button" (click)="toggleFab()">
-          <span class="fab-icon">⚙️</span>
-        </button>
-      </div>
+      <div *ngIf="!isLoading">
+  <div class="fab-container" *ngIf="!isObserver">
+    <div class="fab-menu" [class.open]="isFabOpen">
+      <button class="fab-item" (click)="openInviteMember()">
+        <span class="fab-icon">👥</span>
+        <span class="fab-label">Inviter un membre</span>
+      </button>
+      <button class="fab-item" (click)="openCreateTask()">
+        <span class="fab-icon">➕</span>
+        <span class="fab-label">Créer une tâche</span>
+      </button>
+    </div>
+    <button class="fab-button" (click)="toggleFab()">
+      <span class="fab-icon">⚙️</span>
+    </button>
+  </div>
+</div>
 
-      <!-- Toast de succès -->
+
       <div class="toast" *ngIf="showSuccessToast" [@fadeInOut]>
         <span class="toast-icon">✅</span>
         <span class="toast-message">Invitation envoyée avec succès</span>
       </div>
 
-      <!-- Modal d'invitation -->
+  
       <div class="modal-overlay" *ngIf="showInviteModal" (click)="closeInviteModal()">
         <div class="modal-content" (click)="$event.stopPropagation()">
           <h2>Inviter un membre</h2>
@@ -664,13 +667,12 @@ export class ProjectDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private projectService: ProjectService,
-    private authService: AuthService,
+    private userService: UserService,
     private http: HttpClient
   ) {}
 
   ngOnInit(): void {
     const projectId = this.route.snapshot.paramMap.get('id');
-    console.log('Project ID from route:', projectId);
     if (projectId) {
       this.loadProjectDetails(parseInt(projectId));
     } else {
@@ -680,11 +682,9 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   loadProjectDetails(projectId: number): void {
-    console.log('Loading project details for ID:', projectId);
     this.isLoading = true;
     this.projectService.getProjectById(projectId).subscribe({
       next: (project) => {
-        console.log('Project details loaded:', project);
         this.project = project;
         this.categorizeTasks(project.tasks || []);
         this.checkUserRole();
@@ -701,11 +701,6 @@ export class ProjectDetailsComponent implements OnInit {
     this.todoTasks = tasks.filter(task => task.status === 'TODO');
     this.inProgressTasks = tasks.filter(task => task.status === 'IN_PROGRESS');
     this.doneTasks = tasks.filter(task => task.status === 'DONE');
-    console.log('Tasks categorized:', {
-      todo: this.todoTasks.length,
-      inProgress: this.inProgressTasks.length,
-      done: this.doneTasks.length
-    });
   }
 
   getUsernameById(userId: number): string {
@@ -784,12 +779,19 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   checkUserRole(): void {
-    if (this.project && this.project.members) {
-      const currentUserId = this.authService.getCurrentUserId();
-      const currentUser = this.project.members.find(member => 
-        member.userId === currentUserId
-      );
-      this.isObserver = currentUser?.role === 'OBSERVER';
-    }
+    if (!this.project || !this.project.members) return;
+
+    this.isLoading = true; // Active le spinner pendant la vérification du rôle
+    this.userService.getUserProfile().subscribe({
+      next: (user) => {
+        const currentUser = this.project!.members.find(member => member.userId === user.id);
+        this.isObserver = currentUser?.role === 'OBSERVER';
+        this.isLoading = false; // Désactive le spinner après la vérification
+      },
+      error: (error) => {
+        console.error('Erreur lors de la récupération du profil utilisateur:', error);
+        this.isLoading = false; // Désactive le spinner en cas d'erreur
+      }
+    });
   }
 } 

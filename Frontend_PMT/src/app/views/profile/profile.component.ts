@@ -557,8 +557,6 @@ export class ProfileComponent implements OnInit {
         // Save initial values
         this.initialFormValues = { ...this.editForm };
         this.isLoading = false;
-        console.log('Projets:', this.userProfile?.memberProjects);
-        console.log('Tâches assignées:', this.userProfile?.assignedTasks);
       },
       error: (error) => {
         console.error('Erreur lors de la requête /me:', error);
