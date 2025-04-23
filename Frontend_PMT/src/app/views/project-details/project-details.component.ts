@@ -76,7 +76,7 @@ import { CreateTaskModalComponent } from '../../components/cretae-task-modal/cre
                       </span>
                       <div class="task-details-row">
                         <span class="task-due-date" *ngIf="task.dueDate">
-                          Échéance: {{ task.dueDate | date:'dd/MM/yyyy' }}
+                         Date d'échéance: {{ task.dueDate | date:'dd/MM/yyyy' }}
                         </span>
                         <span class="task-priority" [ngClass]="'priority-' + task.priority?.toLowerCase()">
                           Priorité: {{ task.priority }}
@@ -809,10 +809,11 @@ export class ProjectDetailsComponent implements OnInit {
 
   openCreateTaskModal(): void {
     this.showCreateTaskModal = true;
+    this.isFabOpen = false; 
   }
   
   closeCreateTaskModal(): void {
     this.showCreateTaskModal = false;
-    this.isFabOpen = false; 
+    
   }
 } 

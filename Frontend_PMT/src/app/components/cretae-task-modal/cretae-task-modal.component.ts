@@ -76,6 +76,17 @@ import { TaskService } from '../../services/Task.service';
               </option>
             </select>
           </div>
+          <div class="form-group">
+  <label for="dueDate">Date d'échéance</label>
+  <input 
+    type="date" 
+    id="dueDate" 
+    name="dueDate" 
+    [(ngModel)]="task.dueDate" 
+    required
+    class="form-control"
+  >
+</div>
 
           <div class="form-actions">
             <button 
@@ -282,6 +293,7 @@ export class CreateTaskModalComponent {
     description: '',
     priority: TaskPriority.MEDIUM,
     status: TaskStatus.TODO,
+    dueDate: '',
     createdById: 0,
     projectId: 0
   };
@@ -324,12 +336,15 @@ export class CreateTaskModalComponent {
   onSubmit(event: Event) {
     event.preventDefault();
 
-    if (!this.task.title || !this.task.description) {
+    if (!this.task.title || !this.task.description || !this.task.dueDate) {
       return;
     }
 
+    const dueDateFormatted = `${this.task.dueDate}T00:00:00`;
+    const taskToSend = { ...this.task, dueDate: dueDateFormatted };
+
     this.isLoading = true;
-    this.taskService.createTask(this.task).subscribe({
+    this.taskService.createTask(taskToSend).subscribe({
       next: () => {
         this.isLoading = false;
         this.showToast();

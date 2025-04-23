@@ -267,7 +267,6 @@ export class CreateProjectModalComponent {
   constructor(
     private projectService: ProjectService,
     private userService: UserService,
-    private router: Router
   ) {
     this.loadCurrentUser();
   }
