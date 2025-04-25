@@ -187,7 +187,7 @@ import { CreateTaskModalComponent } from '../../components/create-task-modal/cre
       <div *ngIf="!isLoading">
         <div class="fab-container" *ngIf="!isObserver">
           <div class="fab-menu" [class.open]="isFabOpen">
-            <button class="fab-item" (click)="openInviteMember()">
+            <button class="fab-item" (click)="openInviteMember()"  *ngIf="!isMember">
               <span class="fab-icon">👥</span>
               <span class="fab-label">Inviter un membre</span>
             </button>
@@ -776,6 +776,7 @@ export class ProjectDetailsComponent implements OnInit {
   doneTasks: any[] = [];
   isFabOpen = false;
   isObserver = false;
+  isMember = false;
   showInviteModal = false;
   inviteEmail = '';
   selectedRole: Role = Role.MEMBER;
@@ -920,6 +921,7 @@ export class ProjectDetailsComponent implements OnInit {
           (member) => member.userId === user.id
         );
         this.isObserver = currentUser?.role === 'OBSERVER';
+        this.isMember = currentUser?.role === 'MEMBER';
         this.isLoading = false; // Désactive le spinner après la vérification
       },
       error: (error) => {
