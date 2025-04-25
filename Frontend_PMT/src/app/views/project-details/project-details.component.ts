@@ -6,17 +6,23 @@ import {
   ProjectMember,
   Role,
 } from '../../services/project.service';
-import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../services/user.service';
 import { CreateTaskModalComponent } from '../../components/create-task-modal/create-task-modal.component';
+import { ModalAssignComponent } from '../../components/modal-assign/modal-assign.component';
 
 @Component({
   selector: 'app-project-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, CreateTaskModalComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    CreateTaskModalComponent,
+    ModalAssignComponent,
+  ],
   template: `
     <div class="project-details-container">
       <div *ngIf="isLoading" class="loading-overlay">
@@ -79,7 +85,7 @@ import { CreateTaskModalComponent } from '../../components/create-task-modal/cre
                       <div>
                         <h4>{{ task.title }}</h4>
                       </div>
-                      <div *ngIf="!task.assigneeId" class="unassigned-icon">
+                      <div *ngIf="!task.assigneeId" class="unassigned-icon" (click)="openAssignTaskModal(task.id)">
                         <span>⚠️</span>
                         <div class="tooltip-text">Tâche non assignée</div>
                       </div>
@@ -115,7 +121,7 @@ import { CreateTaskModalComponent } from '../../components/create-task-modal/cre
                       <div>
                         <h4>{{ task.title }}</h4>
                       </div>
-                      <div *ngIf="!task.assigneeId" class="unassigned-icon">
+                      <div *ngIf="!task.assigneeId" class="unassigned-icon" (click)="openAssignTaskModal(task.id)">
                         <span>⚠️</span>
                         <div class="tooltip-text">Tâche non assignée</div>
                       </div>
@@ -149,7 +155,7 @@ import { CreateTaskModalComponent } from '../../components/create-task-modal/cre
                       <div>
                         <h4>{{ task.title }}</h4>
                       </div>
-                      <div *ngIf="!task.assigneeId" class="unassigned-icon">
+                      <div *ngIf="!task.assigneeId" class="unassigned-icon" (click)="openAssignTaskModal(task.id)">
                         <span>⚠️</span>
                         <div class="tooltip-text">Tâche non assignée</div>
                       </div>
@@ -187,7 +193,11 @@ import { CreateTaskModalComponent } from '../../components/create-task-modal/cre
       <div *ngIf="!isLoading">
         <div class="fab-container" *ngIf="!isObserver">
           <div class="fab-menu" [class.open]="isFabOpen">
-            <button class="fab-item" (click)="openInviteMember()"  *ngIf="!isMember">
+            <button
+              class="fab-item"
+              (click)="openInviteMember()"
+              *ngIf="!isMember"
+            >
               <span class="fab-icon">👥</span>
               <span class="fab-label">Inviter un membre</span>
             </button>
@@ -204,10 +214,10 @@ import { CreateTaskModalComponent } from '../../components/create-task-modal/cre
 
       <!-- Modal de création de tâche -->
       <app-create-task-modal
-  *ngIf="showCreateTaskModal"
-  (close)="closeCreateTaskModal()"
-  (taskCreated)="handleTaskCreated(); loadProjectDetails(project!.id)"
-></app-create-task-modal>
+        *ngIf="showCreateTaskModal"
+        (close)="closeCreateTaskModal()"
+        (taskCreated)="handleTaskCreated(); loadProjectDetails(project!.id)"
+      ></app-create-task-modal>
 
       <div class="toast" *ngIf="showSuccessToast" [@fadeInOut]>
         <span class="toast-icon">✅</span>
@@ -215,9 +225,9 @@ import { CreateTaskModalComponent } from '../../components/create-task-modal/cre
       </div>
 
       <div class="toast" *ngIf="showSuccessToastTask">
-      <span class="toast-icon">✅</span>
-      <span class="toast-message">Tâche créée avec succès</span>
-    </div>
+        <span class="toast-icon">✅</span>
+        <span class="toast-message">Tâche créée avec succès</span>
+      </div>
       <div
         class="modal-overlay"
         *ngIf="showInviteModal"
@@ -262,6 +272,15 @@ import { CreateTaskModalComponent } from '../../components/create-task-modal/cre
           </form>
         </div>
       </div>
+      <!-- ModalAssignComponent -->
+      <app-modal-assign
+        *ngIf="showAssignTaskModal"
+        [members]="project?.members ?? []"
+        [taskId]="selectedTaskId"
+        [projectId]="project?.id ?? null"
+        (closeModal)="closeAssignTaskModal()"
+        (taskAssigned)="onTaskAssigned(); loadProjectDetails(project!.id)"
+      ></app-modal-assign>
     </div>
   `,
   styles: [
@@ -785,6 +804,8 @@ export class ProjectDetailsComponent implements OnInit {
   errorMessage = '';
   showCreateTaskModal = false;
   showSuccessToastTask = false;
+  showAssignTaskModal = false;
+  selectedTaskId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -859,10 +880,9 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   handleTaskCreated(): void {
-    this.closeCreateTaskModal(); // Ferme la modal
-    this.showSuccessToastTask = true; // Affiche le toast
-  
-    // Cache le toast après 3 secondes
+    this.closeCreateTaskModal();
+    this.showSuccessToastTask = true;
+
     setTimeout(() => {
       this.showSuccessToastTask = false;
     }, 3000);
@@ -914,7 +934,7 @@ export class ProjectDetailsComponent implements OnInit {
   checkUserRole(): void {
     if (!this.project || !this.project.members) return;
 
-    this.isLoading = true; // Active le spinner pendant la vérification du rôle
+    this.isLoading = true;
     this.userService.getUserProfile().subscribe({
       next: (user) => {
         const currentUser = this.project!.members.find(
@@ -941,5 +961,20 @@ export class ProjectDetailsComponent implements OnInit {
 
   closeCreateTaskModal(): void {
     this.showCreateTaskModal = false;
+  }
+
+  openAssignTaskModal(taskId: number): void {
+    this.selectedTaskId = taskId;
+    this.showAssignTaskModal = true;
+    
+  }
+
+  closeAssignTaskModal(): void {
+    this.showAssignTaskModal = false;
+    this.selectedTaskId = null;
+  }
+
+  onTaskAssigned(): void {
+   this.closeAssignTaskModal()
   }
 }

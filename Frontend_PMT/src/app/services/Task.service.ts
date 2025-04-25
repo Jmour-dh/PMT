@@ -19,4 +19,14 @@ export class TaskService {
 
     return this.http.post(this.apiUrl, task, { headers });
   }
+
+  assignTask(projectId: number, taskId: number, userId: number): Observable<any> {
+    const token = localStorage.getItem('token')
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.patch(`${this.apiUrl}${projectId}/${taskId}/assign/${userId}`, {}, { headers })
+  }
 }
