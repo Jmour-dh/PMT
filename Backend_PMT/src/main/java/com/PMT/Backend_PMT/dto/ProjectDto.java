@@ -47,7 +47,8 @@ public class ProjectDto {
                         member.getUser().getUsername(),
                         member.getRole()))
                 .toList();
-        this.tasks = project.getTasks()
+        this.tasks = project.getTasks() != null
+                ? project.getTasks()
                 .stream()
                 .map(task -> new TaskDto(
                         task.getId(),
@@ -59,6 +60,7 @@ public class ProjectDto {
                         task.getCreatedBy().getId(),
                         task.getAssignee() != null ? task.getAssignee().getId() : null,
                         task.getProject().getId()))
-                .toList();
+                .toList()
+                : List.of();
     }
 }
