@@ -228,6 +228,11 @@ import { ModalAssignComponent } from '../../components/modal-assign/modal-assign
         <span class="toast-icon">✅</span>
         <span class="toast-message">Tâche créée avec succès</span>
       </div>
+
+      <div class="toast" *ngIf="showSuccessToastTaskAssigned">
+        <span class="toast-icon">✅</span>
+        <span class="toast-message">Tâche assignée avec succès</span>
+      </div>
       <div
         class="modal-overlay"
         *ngIf="showInviteModal"
@@ -805,6 +810,7 @@ export class ProjectDetailsComponent implements OnInit {
   showCreateTaskModal = false;
   showSuccessToastTask = false;
   showAssignTaskModal = false;
+  showSuccessToastTaskAssigned = false;
   selectedTaskId: number | null = null;
 
   constructor(
@@ -976,5 +982,10 @@ export class ProjectDetailsComponent implements OnInit {
 
   onTaskAssigned(): void {
    this.closeAssignTaskModal()
+   this.showSuccessToastTaskAssigned = true;
+
+    setTimeout(() => {
+      this.showSuccessToastTaskAssigned = false;
+    }, 3000);
   }
 }
