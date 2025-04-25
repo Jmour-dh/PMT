@@ -213,6 +213,7 @@ public class TaskService {
             <p>
                 <strong>Titre de la tâche :</strong> %s<br>
                 <strong>Description :</strong> %s<br>
+                <strong>Assignée à :</strong> %s<br>
                 <strong>Date d'échéance :</strong> %s
             </p>
             <p>Cordialement,<br>L'équipe PMT</p>
@@ -222,7 +223,9 @@ public class TaskService {
                 task.getProject().getName(),
                 task.getTitle(),
                 task.getDescription(),
+                task.getAssignee() != null ? task.getAssignee().getUsername() : "Non assignée",
                 task.getDueDate() != null ? task.getDueDate().toString() : "Non spécifiée"
+
         );
 
         emailService.sendEmail(subject, content, recipientEmails);
