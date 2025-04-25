@@ -111,11 +111,6 @@ import { TaskService } from '../../services/Task.service';
         </form>
       </div>
     </div>
-
-    <div class="toast" *ngIf="showSuccessToast">
-      <span class="toast-icon">✅</span>
-      <span class="toast-message">Tâche créée avec succès</span>
-    </div>
   `,
   styles: [`
     /* Styles similaires à ceux de la modal de création de projet */
@@ -300,7 +295,6 @@ export class CreateTaskModalComponent {
   priorities = Object.values(TaskPriority);
   statuses = Object.values(TaskStatus);
   isLoading = false;
-  showSuccessToast = false;
 
   constructor(
     private taskService: TaskService,
@@ -347,7 +341,6 @@ export class CreateTaskModalComponent {
     this.taskService.createTask(taskToSend).subscribe({
       next: () => {
         this.isLoading = false;
-        this.showToast();
         this.taskCreated.emit();
         this.closeModal();
       },
@@ -356,12 +349,5 @@ export class CreateTaskModalComponent {
         this.isLoading = false;
       }
     });
-  }
-
-  showToast() {
-    this.showSuccessToast = true;
-    setTimeout(() => {
-      this.showSuccessToast = false;
-    }, 3000);
   }
 }
