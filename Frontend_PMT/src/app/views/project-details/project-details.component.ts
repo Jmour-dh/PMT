@@ -778,7 +778,6 @@ import { ModalAssignComponent } from '../../components/modal-assign/modal-assign
         }
       }
 
-      /* Styles pour le message d'erreur */
       .error-message {
         color: #dc3545;
         font-size: 14px;
@@ -970,6 +969,10 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   openAssignTaskModal(taskId: number): void {
+    if (this.isObserver) {
+      window.alert("Vous n'avez pas la permission d'assigner une tâche.");
+      return;
+    }
     this.selectedTaskId = taskId;
     this.showAssignTaskModal = true;
     

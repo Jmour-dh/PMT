@@ -29,7 +29,6 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<string> {
-    console.log('URL de connexion:', `${this.environmentService.getApiUrl()}/auth/login`);
     return this.http.post(
       `${this.environmentService.getApiUrl()}/auth/login`, 
       { email, password },
@@ -45,7 +44,6 @@ export class AuthService {
   }
 
   handleLoginSuccess(token: string) {
-    console.log('Traitement du token:', token);
     localStorage.setItem('token', token);
     this.isAuthenticatedSubject.next(true);
     this.router.navigate(['/dashboard']);
