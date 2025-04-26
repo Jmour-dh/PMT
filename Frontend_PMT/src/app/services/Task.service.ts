@@ -49,5 +49,16 @@ updateTask(taskId: number, updatedTask: any): Observable<any> {
 
   return this.http.put(`${this.apiUrl}${taskId}`, updatedTask, { headers });
 }
+
+deleteTask(taskId: number, userId: number): Observable<any> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  });
+
+  // Ajout du userId en tant que paramètre de requête
+  return this.http.delete(`${this.apiUrl}${taskId}?userId=${userId}`, { headers });
+}
 }
 

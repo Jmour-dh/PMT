@@ -3,7 +3,6 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
   ProjectService,
   Project,
-  ProjectMember,
   Role,
 } from '../../services/project.service';
 import { CommonModule } from '@angular/common';
@@ -13,6 +12,7 @@ import { UserService } from '../../services/user.service';
 import { CreateTaskModalComponent } from '../../components/create-task-modal/create-task-modal.component';
 import { ModalAssignComponent } from '../../components/modal-assign/modal-assign.component';
 import { TaskHistoryModalComponent } from '../../components/task-history-modal/task-history-modal.component';
+import { TaskService } from '../../services/Task.service';
 
 @Component({
   selector: 'app-project-details',
@@ -284,6 +284,11 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
         <span class="toast-message">Tâche est mise à jour</span>
       </div>
 
+      <div class="toast-delete" *ngIf="showSuccessDeleteToastTask">
+        <span class="toast-icon">✅</span>
+        <span class="toast-message">Tâche supprimé avec succès</span>
+      </div>
+
       <div class="toast" *ngIf="showSuccessToastTaskAssigned">
         <span class="toast-icon">✅</span>
         <span class="toast-message">Tâche assignée avec succès</span>
@@ -344,8 +349,10 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
 
       <app-task-history-modal
         *ngIf="showTaskHistoryModal"
+        [project]="currentProject"
         [taskId]="selectedTaskId"
         (close)="onModalClose()"
+        (deleteTask)="handleDeleteTask($event)"
       >
       </app-task-history-modal>
     </div>
@@ -847,6 +854,23 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
         animation: fadeInOut 3s ease-in-out;
       }
 
+      .toast-delete {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #ff0000;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+        animation: fadeInOut 3s ease-in-out;
+      }
+
+
       .toast-icon {
         font-size: 18px;
       }
@@ -912,11 +936,15 @@ export class ProjectDetailsComponent implements OnInit {
   isEditMode = false;
   taskToEdit: any = null;
   showSuccessUpdateToastTask = false;
+  showSuccessDeleteToastTask = false;
+  currentProject: any;
+  currentUserId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private projectService: ProjectService,
     private userService: UserService,
+    private taskService: TaskService,
     private http: HttpClient
   ) {}
 
@@ -928,7 +956,19 @@ export class ProjectDetailsComponent implements OnInit {
       console.error('No project ID found in route parameters');
       this.isLoading = false;
     }
+
+    this.userService.getUserProfile().subscribe({
+      next: (user) => {
+        this.currentUserId = user.id;
+      },
+      error: (error) => {
+        console.error('Error fetching user profile:', error);
+        this.isLoading = false;
+      }
+    });
   }
+
+  
 
   loadProjectDetails(projectId: number): void {
     this.isLoading = true;
@@ -1097,12 +1137,13 @@ export class ProjectDetailsComponent implements OnInit {
       return;
     }
     this.selectedTaskId = taskId;
-    this.showAssignTaskModal = true;
+    this.showAssignTaskModal = true;  
   }
 
   closeAssignTaskModal(): void {
     this.showAssignTaskModal = false;
     this.selectedTaskId = null;
+    this.currentProject = null;
   }
 
   onTaskAssigned(): void {
@@ -1117,9 +1158,36 @@ export class ProjectDetailsComponent implements OnInit {
   openTaskHistoryModal(taskId: number): void {
     this.selectedTaskId = taskId;
     this.showTaskHistoryModal = true;
+    this.currentProject= this.project;
   }
 
   onModalClose(): void {
     this.showTaskHistoryModal = false;
   }
+
+  handleDeleteTask(taskId: number): void {
+    if (!this.project || !this.currentUserId) {
+        console.error('Impossible de supprimer la tâche : projet ou utilisateur non défini.');
+        return;
+    }
+
+    this.taskService.deleteTask(taskId, this.currentUserId).subscribe({
+        next: () => {
+            if (this.project) {
+                this.loadProjectDetails(this.project.id);
+            }
+            this.showTaskHistoryModal = false;
+            this.showSuccessDeleteToastTask = true;
+
+    setTimeout(() => {
+      this.showSuccessDeleteToastTask = false;
+    }, 3000);
+        },
+        error: (error) => {
+            console.error('Erreur lors de la suppression de la tâche :', error);
+        },
+    });
+}
+
+
 }
