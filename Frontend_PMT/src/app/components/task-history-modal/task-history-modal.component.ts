@@ -29,7 +29,7 @@ import { UserService } from '../../services/user.service';
     Aucun historique disponible.
   </p>
 </div>
-<div class="modal-footer">
+<div class="modal-footer" *ngIf="isAdmin">
   <button class="btn btn-delete"  (click)="onDeleteTask()">
     Supprimer la tâche
   </button>

@@ -51,6 +51,7 @@ import { ActivatedRoute } from '@angular/router';
         display: flex;
         justify-content: center;
         align-items: center;
+        z-index: 20;
       }
 
       .modal-content {
