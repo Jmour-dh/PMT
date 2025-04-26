@@ -12,6 +12,7 @@ import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../services/user.service';
 import { CreateTaskModalComponent } from '../../components/create-task-modal/create-task-modal.component';
 import { ModalAssignComponent } from '../../components/modal-assign/modal-assign.component';
+import { TaskHistoryModalComponent } from '../../components/task-history-modal/task-history-modal.component';
 
 @Component({
   selector: 'app-project-details',
@@ -22,6 +23,7 @@ import { ModalAssignComponent } from '../../components/modal-assign/modal-assign
     FormsModule,
     CreateTaskModalComponent,
     ModalAssignComponent,
+    TaskHistoryModalComponent,
   ],
   template: `
     <div class="project-details-container">
@@ -80,12 +82,16 @@ import { ModalAssignComponent } from '../../components/modal-assign/modal-assign
               <div class="task-column">
                 <h3>Tâches à faire</h3>
                 <div class="task-list">
-                  <div *ngFor="let task of todoTasks" class="task-card">
+                  <div *ngFor="let task of todoTasks" class="task-card" (click)="openTaskHistoryModal(task.id)">
                     <div class="title-span">
                       <div>
                         <h4>{{ task.title }}</h4>
                       </div>
-                      <div *ngIf="!task.assigneeId" class="unassigned-icon" (click)="openAssignTaskModal(task.id)">
+                      <div
+                        *ngIf="!task.assigneeId"
+                        class="unassigned-icon"
+                        (click)="openAssignTaskModal(task.id)"
+                      >
                         <span>⚠️</span>
                         <div class="tooltip-text">Tâche non assignée</div>
                       </div>
@@ -116,12 +122,16 @@ import { ModalAssignComponent } from '../../components/modal-assign/modal-assign
               <div class="task-column">
                 <h3>Tâches en cours</h3>
                 <div class="task-list">
-                  <div *ngFor="let task of inProgressTasks" class="task-card">
+                  <div *ngFor="let task of inProgressTasks" class="task-card" (click)="openTaskHistoryModal(task.id)">
                     <div class="title-span">
                       <div>
                         <h4>{{ task.title }}</h4>
                       </div>
-                      <div *ngIf="!task.assigneeId" class="unassigned-icon" (click)="openAssignTaskModal(task.id)">
+                      <div
+                        *ngIf="!task.assigneeId"
+                        class="unassigned-icon"
+                        (click)="openAssignTaskModal(task.id)"
+                      >
                         <span>⚠️</span>
                         <div class="tooltip-text">Tâche non assignée</div>
                       </div>
@@ -150,12 +160,16 @@ import { ModalAssignComponent } from '../../components/modal-assign/modal-assign
               <div class="task-column">
                 <h3>Tâches terminées</h3>
                 <div class="task-list">
-                  <div *ngFor="let task of doneTasks" class="task-card">
+                  <div *ngFor="let task of doneTasks" class="task-card" (click)="openTaskHistoryModal(task.id)">
                     <div class="title-span">
                       <div>
                         <h4>{{ task.title }}</h4>
                       </div>
-                      <div *ngIf="!task.assigneeId" class="unassigned-icon" (click)="openAssignTaskModal(task.id)">
+                      <div
+                        *ngIf="!task.assigneeId"
+                        class="unassigned-icon"
+                        (click)="openAssignTaskModal(task.id)"
+                      >
                         <span>⚠️</span>
                         <div class="tooltip-text">Tâche non assignée</div>
                       </div>
@@ -286,6 +300,12 @@ import { ModalAssignComponent } from '../../components/modal-assign/modal-assign
         (closeModal)="closeAssignTaskModal()"
         (taskAssigned)="onTaskAssigned(); loadProjectDetails(project!.id)"
       ></app-modal-assign>
+
+      <app-task-history-modal 
+  *ngIf="showTaskHistoryModal"
+  [taskId]="selectedTaskId" 
+  (close)="onModalClose()">
+</app-task-history-modal>
     </div>
   `,
   styles: [
@@ -469,6 +489,7 @@ import { ModalAssignComponent } from '../../components/modal-assign/modal-assign
         padding: 1rem;
         border-radius: 6px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
       }
 
       .unassigned-icon {
@@ -811,6 +832,7 @@ export class ProjectDetailsComponent implements OnInit {
   showAssignTaskModal = false;
   showSuccessToastTaskAssigned = false;
   selectedTaskId: number | null = null;
+  showTaskHistoryModal = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -975,7 +997,6 @@ export class ProjectDetailsComponent implements OnInit {
     }
     this.selectedTaskId = taskId;
     this.showAssignTaskModal = true;
-    
   }
 
   closeAssignTaskModal(): void {
@@ -984,11 +1005,20 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   onTaskAssigned(): void {
-   this.closeAssignTaskModal()
-   this.showSuccessToastTaskAssigned = true;
+    this.closeAssignTaskModal();
+    this.showSuccessToastTaskAssigned = true;
 
     setTimeout(() => {
       this.showSuccessToastTaskAssigned = false;
     }, 3000);
+  }
+
+  openTaskHistoryModal(taskId: number): void {
+    this.selectedTaskId = taskId;
+    this.showTaskHistoryModal = true;
+  }
+
+  onModalClose(): void {
+    this.showTaskHistoryModal = false; 
   }
 }

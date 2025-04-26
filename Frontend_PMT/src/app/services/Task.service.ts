@@ -29,4 +29,15 @@ export class TaskService {
 
     return this.http.patch(`${this.apiUrl}${projectId}/${taskId}/assign/${userId}`, {}, { headers })
   }
+
+getTaskHistory(taskId: number): Observable<any[]> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  });
+
+  return this.http.get<any[]>(`api/task-history/${taskId}`, { headers });
 }
+}
+
