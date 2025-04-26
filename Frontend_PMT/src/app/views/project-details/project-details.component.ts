@@ -82,7 +82,18 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
               <div class="task-column">
                 <h3>Tâches à faire</h3>
                 <div class="task-list">
-                  <div *ngFor="let task of todoTasks" class="task-card" (click)="openTaskHistoryModal(task.id)">
+                  <div
+                    *ngFor="let task of todoTasks"
+                    class="task-card"
+                    (click)="openTaskHistoryModal(task.id)"
+                  >
+                    <div
+                      class="edit-icon"
+                      *ngIf="!isObserver"
+                      (click)="openEditModal($event, task)"
+                    >
+                      ✏️
+                    </div>
                     <div class="title-span">
                       <div>
                         <h4>{{ task.title }}</h4>
@@ -90,7 +101,7 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
                       <div
                         *ngIf="!task.assigneeId"
                         class="unassigned-icon"
-                        (click)="openAssignTaskModal(task.id)"
+                        (click)="openAssignTaskModal($event, task.id)"
                       >
                         <span>⚠️</span>
                         <div class="tooltip-text">Tâche non assignée</div>
@@ -122,7 +133,18 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
               <div class="task-column">
                 <h3>Tâches en cours</h3>
                 <div class="task-list">
-                  <div *ngFor="let task of inProgressTasks" class="task-card" (click)="openTaskHistoryModal(task.id)">
+                  <div
+                    *ngFor="let task of inProgressTasks"
+                    class="task-card"
+                    (click)="openTaskHistoryModal(task.id)"
+                  >
+                    <div
+                      class="edit-icon"
+                      *ngIf="!isObserver"
+                      (click)="openEditModal($event, task)"
+                    >
+                      ✏️
+                    </div>
                     <div class="title-span">
                       <div>
                         <h4>{{ task.title }}</h4>
@@ -130,7 +152,7 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
                       <div
                         *ngIf="!task.assigneeId"
                         class="unassigned-icon"
-                        (click)="openAssignTaskModal(task.id)"
+                        (click)="openAssignTaskModal($event, task.id)"
                       >
                         <span>⚠️</span>
                         <div class="tooltip-text">Tâche non assignée</div>
@@ -160,7 +182,18 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
               <div class="task-column">
                 <h3>Tâches terminées</h3>
                 <div class="task-list">
-                  <div *ngFor="let task of doneTasks" class="task-card" (click)="openTaskHistoryModal(task.id)">
+                  <div
+                    *ngFor="let task of doneTasks"
+                    class="task-card"
+                    (click)="openTaskHistoryModal(task.id)"
+                  >
+                    <div
+                      class="edit-icon"
+                      *ngIf="!isObserver"
+                      (click)="openEditModal($event, task)"
+                    >
+                      ✏️
+                    </div>
                     <div class="title-span">
                       <div>
                         <h4>{{ task.title }}</h4>
@@ -168,7 +201,7 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
                       <div
                         *ngIf="!task.assigneeId"
                         class="unassigned-icon"
-                        (click)="openAssignTaskModal(task.id)"
+                        (click)="openAssignTaskModal($event, task.id)"
                       >
                         <span>⚠️</span>
                         <div class="tooltip-text">Tâche non assignée</div>
@@ -229,8 +262,11 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
       <!-- Modal de création de tâche -->
       <app-create-task-modal
         *ngIf="showCreateTaskModal"
+        [taskToEdit]="selectedTask"
+        [isEditMode]="isEditMode"
         (close)="closeCreateTaskModal()"
         (taskCreated)="handleTaskCreated(); loadProjectDetails(project!.id)"
+        (taskUpdated)="handleTaskUpdated(); loadProjectDetails(project!.id)"
       ></app-create-task-modal>
 
       <div class="toast" *ngIf="showSuccessToast" [@fadeInOut]>
@@ -241,6 +277,11 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
       <div class="toast" *ngIf="showSuccessToastTask">
         <span class="toast-icon">✅</span>
         <span class="toast-message">Tâche créée avec succès</span>
+      </div>
+
+      <div class="toast-update" *ngIf="showSuccessUpdateToastTask">
+        <span class="toast-icon">✅</span>
+        <span class="toast-message">Tâche est mise à jour</span>
       </div>
 
       <div class="toast" *ngIf="showSuccessToastTaskAssigned">
@@ -301,11 +342,12 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
         (taskAssigned)="onTaskAssigned(); loadProjectDetails(project!.id)"
       ></app-modal-assign>
 
-      <app-task-history-modal 
-  *ngIf="showTaskHistoryModal"
-  [taskId]="selectedTaskId" 
-  (close)="onModalClose()">
-</app-task-history-modal>
+      <app-task-history-modal
+        *ngIf="showTaskHistoryModal"
+        [taskId]="selectedTaskId"
+        (close)="onModalClose()"
+      >
+      </app-task-history-modal>
     </div>
   `,
   styles: [
@@ -490,6 +532,23 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
         border-radius: 6px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         cursor: pointer;
+        position: relative;
+      }
+
+      .task-card .edit-icon {
+        position: absolute;
+        top: -0.5rem;
+        right: 0.1rem;
+        width: 1rem;
+        height: 1rem;
+        cursor: pointer;
+        z-index: 10;
+      }
+
+      .task-card .edit-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
       }
 
       .unassigned-icon {
@@ -772,6 +831,22 @@ import { TaskHistoryModalComponent } from '../../components/task-history-modal/t
         animation: fadeInOut 3s ease-in-out;
       }
 
+      .toast-update {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #0ebeff;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+        animation: fadeInOut 3s ease-in-out;
+      }
+
       .toast-icon {
         font-size: 18px;
       }
@@ -833,6 +908,10 @@ export class ProjectDetailsComponent implements OnInit {
   showSuccessToastTaskAssigned = false;
   selectedTaskId: number | null = null;
   showTaskHistoryModal = false;
+  selectedTask: any;
+  isEditMode = false;
+  taskToEdit: any = null;
+  showSuccessUpdateToastTask = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -915,6 +994,15 @@ export class ProjectDetailsComponent implements OnInit {
     }, 3000);
   }
 
+  handleTaskUpdated(): void {
+    this.closeCreateTaskModal();
+    this.showSuccessUpdateToastTask = true;
+
+    setTimeout(() => {
+      this.showSuccessUpdateToastTask = false;
+    }, 3000);
+  }
+
   submitInvitation() {
     if (!this.project) return;
     this.errorMessage = '';
@@ -969,28 +1057,41 @@ export class ProjectDetailsComponent implements OnInit {
         );
         this.isObserver = currentUser?.role === 'OBSERVER';
         this.isMember = currentUser?.role === 'MEMBER';
-        this.isLoading = false; // Désactive le spinner après la vérification
+        this.isLoading = false;
       },
       error: (error) => {
         console.error(
           'Erreur lors de la récupération du profil utilisateur:',
           error
         );
-        this.isLoading = false; // Désactive le spinner en cas d'erreur
+        this.isLoading = false;
       },
     });
   }
 
   openCreateTaskModal(): void {
+    this.selectedTask = null;
+    this.isEditMode = false;
+    this.taskToEdit = null;
     this.showCreateTaskModal = true;
     this.isFabOpen = false;
   }
 
-  closeCreateTaskModal(): void {
-    this.showCreateTaskModal = false;
+  openEditModal(event: Event, task: any) {
+    event.stopPropagation();
+    this.selectedTask = task;
+    this.isEditMode = true;
+    this.showCreateTaskModal = true;
   }
 
-  openAssignTaskModal(taskId: number): void {
+  closeCreateTaskModal(): void {
+    this.showCreateTaskModal = false;
+    this.isEditMode = false;
+    this.taskToEdit = null;
+  }
+
+  openAssignTaskModal(event: Event, taskId: number): void {
+    event.stopPropagation();
     if (this.isObserver) {
       window.alert("Vous n'avez pas la permission d'assigner une tâche.");
       return;
@@ -1019,6 +1120,6 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   onModalClose(): void {
-    this.showTaskHistoryModal = false; 
+    this.showTaskHistoryModal = false;
   }
 }

@@ -39,5 +39,15 @@ getTaskHistory(taskId: number): Observable<any[]> {
 
   return this.http.get<any[]>(`api/task-history/${taskId}`, { headers });
 }
+
+updateTask(taskId: number, updatedTask: any): Observable<any> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  });
+
+  return this.http.put(`${this.apiUrl}${taskId}`, updatedTask, { headers });
+}
 }
 
