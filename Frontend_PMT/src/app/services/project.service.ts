@@ -87,4 +87,19 @@ export class ProjectService {
 
     return this.http.post<Project>('/api/projects/', formattedProject, { headers });
   }
+
+  updateProject(project: Project): Observable<Project> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    const formattedProject = {
+      ...project,
+      startDate: formatDate(project.startDate, 'yyyy-MM-dd', 'fr-FR')
+    };
+
+    return this.http.put<Project>(`/api/projects/${project.id}`, formattedProject, { headers });
+  }
 } 

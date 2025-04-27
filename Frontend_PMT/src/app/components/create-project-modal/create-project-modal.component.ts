@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectService } from '../../services/project.service';
 import { UserService } from '../../services/user.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-project-modal',

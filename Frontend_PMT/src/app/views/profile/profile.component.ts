@@ -109,6 +109,7 @@ import { User, Project, Task } from '../../models/user.model';
                 *ngFor="let project of userProfile?.memberProjects"
                 class="project-item"
               >
+                <div class="edit-icon">✏️</div>
                 <div class="project-main">
                   <h3>{{ project.name }}</h3>
                   <p class="project-description">{{ project.description }}</p>
@@ -305,6 +306,15 @@ import { User, Project, Task } from '../../models/user.model';
         border-radius: 8px;
         padding: 1.2rem;
         transition: transform 0.2s;
+        position: relative;
+      }
+      
+      .edit-icon {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 10px;
+        cursor: pointer;
       }
 
       .project-item:hover,

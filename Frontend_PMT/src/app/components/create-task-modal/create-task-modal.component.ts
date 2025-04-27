@@ -352,6 +352,9 @@ resetForm() {
   priorities = Object.values(TaskPriority);
   statuses = Object.values(TaskStatus);
   isLoading = false;
+  showToast = false;
+toastMessage = '';
+toastColor = '';
 
   constructor(
     private taskService: TaskService,
@@ -387,20 +390,23 @@ resetForm() {
 
   onSubmit(event: Event) {
     event.preventDefault();
-
+  
     if (!this.task.title || !this.task.description || !this.task.dueDate) {
       return;
     }
-
+  
     const dueDateFormatted = `${this.task.dueDate}T00:00:00`;
     const taskToSend = { ...this.task, dueDate: dueDateFormatted };
-
+  
     this.isLoading = true;
     if (this.isEditMode && this.taskId) {
       // Mode édition : mise à jour de la tâche
       this.taskService.updateTask(this.taskId, taskToSend).subscribe({
         next: () => {
           this.isLoading = false;
+          this.toastMessage = 'Tâche mise à jour avec succès';
+          this.toastColor = '#007bff'; // Couleur bleue
+          this.showToast = true;
           this.taskUpdated.emit();
           this.resetForm();
           this.closeModal();
@@ -415,8 +421,12 @@ resetForm() {
       this.taskService.createTask(taskToSend).subscribe({
         next: () => {
           this.isLoading = false;
+          this.toastMessage = 'Tâche créée avec succès';
+          this.toastColor = '#4caf50'; // Couleur verte
+          this.showToast = true;
           this.taskCreated.emit();
           this.closeModal();
+  
         },
         error: (error) => {
           console.error('Error creating task:', error);
