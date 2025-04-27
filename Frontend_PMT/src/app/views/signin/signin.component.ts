@@ -33,7 +33,8 @@ export class SigninComponent {
     this.authService.login(this.credentials.email, this.credentials.password)
       .subscribe({
         next: (token) => {
-          console.log('Token reçu:', token);
+        
+          
           this.errorMessage = '';
           this.authService.handleLoginSuccess(token);
           this.isLoading = false;

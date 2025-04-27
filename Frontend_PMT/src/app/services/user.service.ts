@@ -27,7 +27,7 @@ export class UserService {
     });
     return this.http.put<any>(`/api/users/${userId}`, data, { 
       headers,
-      observe: 'response' // Cela nous permettra de voir la réponse complète, même si elle est vide
+      observe: 'response' 
     });
   }
 }
