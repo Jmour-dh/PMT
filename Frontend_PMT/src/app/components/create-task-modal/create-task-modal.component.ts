@@ -1,10 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  TaskPriority,
-  TaskStatus,
-} from '../../services/project.service';
+import { TaskPriority, TaskStatus } from '../../services/project.service';
 import { UserService } from '../../services/user.service';
 import { ActivatedRoute } from '@angular/router';
 import { TaskService } from '../../services/Task.service';
@@ -17,7 +14,13 @@ import { TaskService } from '../../services/Task.service';
     <div class="modal-overlay" (click)="closeModal()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2> {{isEditMode ? 'Mettre à jour cette tâche' : 'Créer une nouvelle tâche' }} </h2>
+          <h2>
+            {{
+              isEditMode
+                ? 'Mettre à jour cette tâche'
+                : 'Créer une nouvelle tâche'
+            }}
+          </h2>
           <button class="close-btn" (click)="closeModal()">
             <i class="fas fa-times"></i>
           </button>
@@ -321,10 +324,10 @@ export class CreateTaskModalComponent {
         projectId: task.projectId,
       };
     } else {
-      this.resetForm(); 
+      this.resetForm();
     }
   }
-  
+
   task = {
     title: '',
     description: '',
@@ -335,26 +338,26 @@ export class CreateTaskModalComponent {
     projectId: 0,
   };
 
-resetForm() {
-  this.task = {
-    title: '',
-    description: '',
-    priority: TaskPriority.MEDIUM,
-    status: TaskStatus.TODO,
-    dueDate: '',
-    createdById: 0, 
-    projectId: this.task.projectId 
-  };
-  this.isEditMode = false;
-  this.taskId = null;
-}
+  resetForm() {
+    this.task = {
+      title: '',
+      description: '',
+      priority: TaskPriority.MEDIUM,
+      status: TaskStatus.TODO,
+      dueDate: '',
+      createdById: 0,
+      projectId: this.task.projectId,
+    };
+    this.isEditMode = false;
+    this.taskId = null;
+  }
 
   priorities = Object.values(TaskPriority);
   statuses = Object.values(TaskStatus);
   isLoading = false;
   showToast = false;
-toastMessage = '';
-toastColor = '';
+  toastMessage = '';
+  toastColor = '';
 
   constructor(
     private taskService: TaskService,
@@ -390,14 +393,14 @@ toastColor = '';
 
   onSubmit(event: Event) {
     event.preventDefault();
-  
+
     if (!this.task.title || !this.task.description || !this.task.dueDate) {
       return;
     }
-  
+
     const dueDateFormatted = `${this.task.dueDate}T00:00:00`;
     const taskToSend = { ...this.task, dueDate: dueDateFormatted };
-  
+
     this.isLoading = true;
     if (this.isEditMode && this.taskId) {
       // Mode édition : mise à jour de la tâche
@@ -426,7 +429,6 @@ toastColor = '';
           this.showToast = true;
           this.taskCreated.emit();
           this.closeModal();
-  
         },
         error: (error) => {
           console.error('Error creating task:', error);

@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { User, Project, Task } from '../../models/user.model';
+import { CreateProjectModalComponent } from '../../components/create-project-modal/create-project-modal.component';
+import { ProjectService } from '../../services/project.service';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CreateProjectModalComponent],
   template: `
     <div class="profile-wrapper">
       <!-- Loading Spinner -->
@@ -109,7 +111,7 @@ import { User, Project, Task } from '../../models/user.model';
                 *ngFor="let project of userProfile?.memberProjects"
                 class="project-item"
               >
-                <div class="edit-icon">✏️</div>
+                <div class="edit-icon" (click)="openEditModal(project)">✏️</div>
                 <div class="project-main">
                   <h3>{{ project.name }}</h3>
                   <p class="project-description">{{ project.description }}</p>
@@ -154,6 +156,15 @@ import { User, Project, Task } from '../../models/user.model';
           </section>
         </div>
       </div>
+      <app-create-project-modal
+        *ngIf="showCreateProjectModal"
+        [projectToEdit]="selectedProject"
+        [isEditMode]="isEditMode"
+        (close)="closeCreateProjectModal()"
+        (projectUpdated)="
+          handleProjectUpdated();
+        "
+      ></app-create-project-modal>
     </div>
   `,
   styles: [
@@ -308,7 +319,7 @@ import { User, Project, Task } from '../../models/user.model';
         transition: transform 0.2s;
         position: relative;
       }
-      
+
       .edit-icon {
         position: absolute;
         top: 0;
@@ -576,13 +587,23 @@ export class ProfileComponent implements OnInit {
   isUpdating = false;
   updateError: string | null = null;
   updateSuccess = false;
+  showCreateProjectModal = false;
+  selectedProject: any;
+  isEditMode = false;
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private projectService: ProjectService
+  ) {}
 
   ngOnInit() {
+    this.loadProfile();
+  }
+
+  loadProfile(): void {
+    this.isLoading = true;
     this.userService.getUserProfile().subscribe({
       next: (response) => {
-        console.log('Réponse complète:', response);
         this.userProfile = response;
         // Initialize form with current values
         this.editForm.username = response.username;
@@ -704,4 +725,20 @@ export class ProfileComponent implements OnInit {
         },
       });
   }
+
+  closeCreateProjectModal(): void {
+    this.showCreateProjectModal = false;
+  }
+
+  handleProjectUpdated(): void {
+    this.closeCreateProjectModal();
+    this.loadProfile(); // Recharger le profil après la mise à jour
+  }
+
+  openEditModal(projet: any) {
+    this.selectedProject = projet;
+    this.isEditMode = true;
+    this.showCreateProjectModal = true;
+  }
+
 }
