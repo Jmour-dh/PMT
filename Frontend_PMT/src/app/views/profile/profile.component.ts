@@ -96,7 +96,7 @@ import { ProjectService } from '../../services/project.service';
             </div>
           </form>
         </div>
-        <div>
+        <div class="section-delete">
           <button class="btn-delete" (click)="openDeleteConfirmation()">
             Clôturer compte
           </button>
@@ -604,6 +604,12 @@ import { ProjectService } from '../../services/project.service';
           margin-top: 1rem;
         }
       }
+
+      .section-delete {
+        margin-top: 2rem;
+        text-align: center;
+      }
+
       .btn-delete {
         background-color: #e74c3c;
         color: white;
