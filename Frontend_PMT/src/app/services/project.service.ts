@@ -88,7 +88,7 @@ export class ProjectService {
     return this.http.post<Project>('/api/projects/', formattedProject, { headers });
   }
 
-  updateProject(project: Project): Observable<Project> {
+  updateProject(project: any): Observable<Project> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
