@@ -102,4 +102,13 @@ export class ProjectService {
 
     return this.http.put<Project>(`/api/projects/${project.id}`, formattedProject, { headers });
   }
+
+  deleteProject(id: number): Observable<void> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.delete<void>(`/api/projects/${id}`, { headers });
+  }
 } 

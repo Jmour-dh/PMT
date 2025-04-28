@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
@@ -111,7 +111,9 @@ import { ProjectService } from '../../services/project.service';
                 *ngFor="let project of userProfile?.memberProjects"
                 class="project-item"
               >
+              <div class="delete-icon" (click)="confirmDeleteProject(project.id)">🗑️</div>
                 <div class="edit-icon" (click)="openEditModal(project)">✏️</div>
+                
                 <div class="project-main">
                   <h3>{{ project.name }}</h3>
                   <p class="project-description">{{ project.description }}</p>
@@ -320,10 +322,18 @@ import { ProjectService } from '../../services/project.service';
         position: relative;
       }
 
-      .edit-icon {
+      .delete-icon {
         position: absolute;
         top: 0;
         right: 0;
+        margin: 10px;
+        cursor: pointer;
+      }
+
+      .edit-icon {
+        position: absolute;
+        top: 0;
+        right: 30px;
         margin: 10px;
         cursor: pointer;
       }
@@ -573,6 +583,7 @@ import { ProjectService } from '../../services/project.service';
   ],
 })
 export class ProfileComponent implements OnInit {
+  @Output() projectDeleted = new EventEmitter<void>();
   userProfile: User | null = null;
   isLoading = true;
   editForm = {
@@ -739,6 +750,23 @@ export class ProfileComponent implements OnInit {
     this.selectedProject = projet;
     this.isEditMode = true;
     this.showCreateProjectModal = true;
+  }
+
+  confirmDeleteProject(projectId: number): void {
+    const confirmation = window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');
+    if (confirmation) {
+      this.projectService.deleteProject(projectId).subscribe({
+        next: () => {
+          console.log('Projet supprimé avec succès.');
+          // Ajoutez ici une logique pour rafraîchir la liste des projets ou fermer un modal
+          this.projectDeleted.emit();
+           this.loadProfile(); 
+        },
+        error: (error) => {
+          console.error('Erreur lors de la suppression du projet :', error);
+        }
+      });
+    }
   }
 
 }
