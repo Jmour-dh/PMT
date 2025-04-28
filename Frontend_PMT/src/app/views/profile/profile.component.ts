@@ -96,6 +96,11 @@ import { ProjectService } from '../../services/project.service';
             </div>
           </form>
         </div>
+        <div>
+          <button class="btn-delete" (click)="openDeleteConfirmation()">
+            Clôturer compte
+          </button>
+        </div>
       </div>
 
       <div class="profile-main">
@@ -111,9 +116,14 @@ import { ProjectService } from '../../services/project.service';
                 *ngFor="let project of userProfile?.memberProjects"
                 class="project-item"
               >
-              <div class="delete-icon" (click)="confirmDeleteProject(project.id)">🗑️</div>
+                <div
+                  class="delete-icon"
+                  (click)="confirmDeleteProject(project.id)"
+                >
+                  🗑️
+                </div>
                 <div class="edit-icon" (click)="openEditModal(project)">✏️</div>
-                
+
                 <div class="project-main">
                   <h3>{{ project.name }}</h3>
                   <p class="project-description">{{ project.description }}</p>
@@ -163,10 +173,25 @@ import { ProjectService } from '../../services/project.service';
         [projectToEdit]="selectedProject"
         [isEditMode]="isEditMode"
         (close)="closeCreateProjectModal()"
-        (projectUpdated)="
-          handleProjectUpdated();
-        "
+        (projectUpdated)="handleProjectUpdated()"
       ></app-create-project-modal>
+      <!-- Popup de confirmation -->
+      <div *ngIf="showDeletePopup" class="popup-overlay">
+        <div class="popup">
+          <p>
+            Êtes-vous sûr de vouloir clôturer votre compte ? Cette action est
+            irréversible.
+          </p>
+          <div class="popup-actions">
+            <button class="btn-confirm" (click)="confirmDelete()">
+              Confirmer
+            </button>
+            <button class="btn-cancel" (click)="closeDeleteConfirmation()">
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   `,
   styles: [
@@ -579,6 +604,72 @@ import { ProjectService } from '../../services/project.service';
           margin-top: 1rem;
         }
       }
+      .btn-delete {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      .btn-delete:hover {
+        background-color: #c0392b;
+      }
+
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .popup {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .popup-actions {
+        margin-top: 20px;
+      }
+
+      .btn-confirm {
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      .btn-confirm:hover {
+        background-color: #229954;
+      }
+
+      .btn-cancel {
+        background-color: #bdc3c7;
+        color: black;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-left: 10px;
+      }
+
+      .btn-cancel:hover {
+        background-color: #95a5a6;
+      }
     `,
   ],
 })
@@ -601,6 +692,8 @@ export class ProfileComponent implements OnInit {
   showCreateProjectModal = false;
   selectedProject: any;
   isEditMode = false;
+  showDeletePopup = false;
+  isDeleting = false;
 
   constructor(
     private userService: UserService,
@@ -616,10 +709,8 @@ export class ProfileComponent implements OnInit {
     this.userService.getUserProfile().subscribe({
       next: (response) => {
         this.userProfile = response;
-        // Initialize form with current values
         this.editForm.username = response.username;
         this.editForm.email = response.email;
-        // Save initial values
         this.initialFormValues = { ...this.editForm };
         this.isLoading = false;
       },
@@ -651,11 +742,9 @@ export class ProfileComponent implements OnInit {
             this.updateSuccess = true;
             this.isUpdating = false;
 
-            // Update initial values after successful save
             this.initialFormValues = { ...this.editForm };
             this.hasChanges = false;
 
-            // Rafraîchir les données du profil
             this.userService.getUserProfile().subscribe({
               next: (updatedProfile) => {
                 this.userProfile = updatedProfile;
@@ -676,11 +765,9 @@ export class ProfileComponent implements OnInit {
             this.updateSuccess = true;
             this.isUpdating = false;
 
-            // Update initial values after successful save
             this.initialFormValues = { ...this.editForm };
             this.hasChanges = false;
 
-            // Rafraîchir les données du profil
             this.userService.getUserProfile().subscribe({
               next: (updatedProfile) => {
                 this.userProfile = updatedProfile;
@@ -697,7 +784,6 @@ export class ProfileComponent implements OnInit {
           } else {
             console.error("Détails de l'erreur:", error);
 
-            // Gestion des erreurs spécifiques
             if (error.status === 400) {
               const errorMessage = error.error?.message || error.error;
               if (typeof errorMessage === 'string') {
@@ -743,7 +829,7 @@ export class ProfileComponent implements OnInit {
 
   handleProjectUpdated(): void {
     this.closeCreateProjectModal();
-    this.loadProfile(); // Recharger le profil après la mise à jour
+    this.loadProfile();
   }
 
   openEditModal(projet: any) {
@@ -753,20 +839,51 @@ export class ProfileComponent implements OnInit {
   }
 
   confirmDeleteProject(projectId: number): void {
-    const confirmation = window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');
+    const confirmation = window.confirm(
+      'Êtes-vous sûr de vouloir supprimer ce projet ?'
+    );
     if (confirmation) {
       this.projectService.deleteProject(projectId).subscribe({
         next: () => {
           console.log('Projet supprimé avec succès.');
-          // Ajoutez ici une logique pour rafraîchir la liste des projets ou fermer un modal
           this.projectDeleted.emit();
-           this.loadProfile(); 
+          this.loadProfile();
         },
         error: (error) => {
           console.error('Erreur lors de la suppression du projet :', error);
-        }
+        },
       });
     }
   }
 
+  openDeleteConfirmation(): void {
+    this.showDeletePopup = true;
+  }
+
+  closeDeleteConfirmation(): void {
+    this.showDeletePopup = false;
+  }
+
+  confirmDelete(): void {
+    this.isDeleting = true;
+    const userId = this.userProfile?.id?.toString();
+
+    if (userId) {
+      this.userService.deleteUserProfile(userId).subscribe({
+        next: () => {
+          this.isDeleting = false;
+          this.showDeletePopup = false;
+
+          localStorage.removeItem('token');
+          window.location.href = '/signin';
+        },
+        error: (err) => {
+          this.isDeleting = false;
+          this.showDeletePopup = false;
+          alert('Une erreur est survenue lors de la suppression du compte.');
+          console.error(err);
+        },
+      });
+    }
+  }
 }

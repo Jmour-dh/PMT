@@ -30,4 +30,16 @@ export class UserService {
       observe: 'response' 
     });
   }
+
+  deleteUserProfile(userId: string): Observable<HttpResponse<any>> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.delete<any>(`/api/users/${userId}`, { 
+      headers,
+      observe: 'response' 
+    });
+  }
 }
