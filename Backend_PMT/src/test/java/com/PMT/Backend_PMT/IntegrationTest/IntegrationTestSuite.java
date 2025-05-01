@@ -49,33 +49,15 @@ public class IntegrationTestSuite {
     private UserIntegrationTests userIntegrationTests;
 
     @BeforeAll
-    void initializeDatabase() throws Exception {
+    void initializeDatabase() {
         userRepository.deleteAll();
-
-        userRepository.save(User.builder()
-                .username("testuser")
-                .email("testuser@pmt.com")
-                .passwordHash(passwordEncoder.encode("Testpass123!"))
-                .build());
-
-        AuthDto loginRequest = new AuthDto("testuser@pmt.com", "Testpass123!");
-        String requestBody = objectMapper.writeValueAsString(loginRequest);
-
-        MvcResult result = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String token = result.getResponse().getContentAsString();
-        tokenHolder.setToken(token);
     }
 
     @Test
     @Order(1)
     void runAuthIntegrationTests() throws Exception {
         authIntegrationTests.signupNewUser_Success();
-//        authIntegrationTests.loginUser_Success();
+        authIntegrationTests.loginUser();
     }
 
     @Test

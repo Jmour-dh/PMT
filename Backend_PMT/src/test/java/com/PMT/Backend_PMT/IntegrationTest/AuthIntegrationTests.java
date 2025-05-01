@@ -48,6 +48,31 @@ public class AuthIntegrationTests {
 //            .password("Testpass123!")
 //            .build();
 
+    @BeforeAll
+    void loginUser() throws Exception {
+        // Créer un utilisateur pour le test si nécessaire
+        if (!userRepository.existsByEmail("testuser@pmt.com")) {
+            userRepository.save(User.builder()
+                    .username("testuser")
+                    .email("testuser@pmt.com")
+                    .passwordHash(passwordEncoder.encode("Testpass123!"))
+                    .build());
+        }
+
+        // Effectuer la connexion
+        AuthDto loginRequest = new AuthDto("testuser@pmt.com", "Testpass123!");
+        String requestBody = objectMapper.writeValueAsString(loginRequest);
+
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String token = result.getResponse().getContentAsString();
+        tokenHolder.setToken(token); // Stocker le token pour les autres tests
+    }
+
     @Test
     @Order(1)
     @DisplayName("Create new user - Success")
