@@ -57,7 +57,7 @@ public class IntegrationTestSuite {
     @Order(1)
     void runAuthIntegrationTests() throws Exception {
         authIntegrationTests.signupNewUser_Success();
-        authIntegrationTests.loginUser();
+        authIntegrationTests.loginUser_Success();
     }
 
     @Test

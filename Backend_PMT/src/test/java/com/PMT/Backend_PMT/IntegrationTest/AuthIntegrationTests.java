@@ -42,15 +42,9 @@ public class AuthIntegrationTests {
     @Autowired
     private TokenHolder tokenHolder;
 
-//    private final UserDto newUser = UserDto.builder()
-//            .username("testuser")
-//            .email("testuser@pmt.com")
-//            .password("Testpass123!")
-//            .build();
-
     @BeforeAll
-    void loginUser() throws Exception {
-        // Créer un utilisateur pour le test si nécessaire
+    void loginUser_Success() throws Exception {
+
         if (!userRepository.existsByEmail("testuser@pmt.com")) {
             userRepository.save(User.builder()
                     .username("testuser")
@@ -59,7 +53,7 @@ public class AuthIntegrationTests {
                     .build());
         }
 
-        // Effectuer la connexion
+
         AuthDto loginRequest = new AuthDto("testuser@pmt.com", "Testpass123!");
         String requestBody = objectMapper.writeValueAsString(loginRequest);
 
@@ -70,14 +64,13 @@ public class AuthIntegrationTests {
                 .andReturn();
 
         String token = result.getResponse().getContentAsString();
-        tokenHolder.setToken(token); // Stocker le token pour les autres tests
+        tokenHolder.setToken(token);
     }
 
     @Test
     @Order(1)
     @DisplayName("Create new user - Success")
     void signupNewUser_Success() throws Exception {
-        // Utiliser un email unique pour éviter les conflits
         UserDto uniqueUser = UserDto.builder()
                 .username("newuniqueuser")
                 .email("newuniqueuser@pmt.com")
@@ -96,32 +89,4 @@ public class AuthIntegrationTests {
                 .andExpect(jsonPath("$.username").value(uniqueUser.getUsername()));
     }
 
-//    @Test
-//    @Order(2)
-//    @DisplayName("User login - Success")
-//    void loginUser_Success() throws Exception {
-//        // Vérifier si l'utilisateur existe déjà
-//        if (!userRepository.existsByEmail(newUser.getEmail())) {
-//            userRepository.save(User.builder()
-//                    .username(newUser.getUsername())
-//                    .email(newUser.getEmail())
-//                    .passwordHash(passwordEncoder.encode(newUser.getPassword()))
-//                    .build());
-//        }
-//
-//        AuthDto loginRequest = new AuthDto(newUser.getEmail(), newUser.getPassword());
-//        String requestBody = objectMapper.writeValueAsString(loginRequest);
-//
-//        MvcResult result = mockMvc.perform(post("/api/auth/login")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(requestBody))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType("text/plain;charset=UTF-8"))
-//                .andReturn();
-//
-//        String token = result.getResponse().getContentAsString();
-//        tokenHolder.setToken(token); // Stocker le token
-//        System.out.println("Token généré : " + token);
-//        Assertions.assertNotNull(token, "Token should not be null");
-//    }
 }

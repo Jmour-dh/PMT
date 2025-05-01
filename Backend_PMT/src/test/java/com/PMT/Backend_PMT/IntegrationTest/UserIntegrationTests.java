@@ -36,8 +36,8 @@ public class UserIntegrationTests {
     @DisplayName("Create user - Success")
     void createUser_Success() throws Exception {
         String token = tokenHolder.getToken();
-        Assertions.assertNotNull(token, "Le token d'authentification ne doit pas être null");
-        Assertions.assertFalse(token.isBlank(), "Le token d'authentification ne doit pas être vide");
+        Assertions.assertNotNull(token, "The authentication token must not be null");
+        Assertions.assertFalse(token.isBlank(), "The authentication token must not be empty");
 
         UserDto newUser = UserDto.builder()
                 .username("newuser")
