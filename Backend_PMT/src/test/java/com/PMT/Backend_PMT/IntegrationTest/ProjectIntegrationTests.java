@@ -1,6 +1,8 @@
 package com.PMT.Backend_PMT.IntegrationTest;
 
-import com.PMT.Backend_PMT.dto.UserDto;
+import com.PMT.Backend_PMT.dto.ProjectDto;
+import com.PMT.Backend_PMT.entity.User;
+import com.PMT.Backend_PMT.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDate;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -20,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:applicationTest.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class UserIntegrationTests {
+public class ProjectIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -29,126 +33,137 @@ public class UserIntegrationTests {
     private ObjectMapper objectMapper;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private com.PMT.Backend_PMT.util.TokenHolder tokenHolder;
+
+    private Long projectId;
 
     @Test
     @Order(1)
-    @DisplayName("Create user - Success")
-    void createUser_Success() throws Exception {
+    @DisplayName("Create project - Success")
+    void createProject_Success() throws Exception {
         String token = tokenHolder.getToken();
         Assertions.assertNotNull(token, "The authentication token must not be null");
         Assertions.assertFalse(token.isBlank(), "The authentication token must not be empty");
 
-        UserDto newUser = UserDto.builder()
-                .username("newuser")
-                .email("newuser@pmt.com")
-                .password("Newpass123!")
+        // Get the connected user
+        User user = userRepository.findByEmail("testuser@pmt.com")
+                .orElseThrow(() -> new IllegalStateException("Utilisateur introuvable"));
+
+        // Create a new project
+        ProjectDto newProject = ProjectDto.builder()
+                .name("Test Project")
+                .description("Description du projet de test")
+                .startDate(LocalDate.now())
+                .createdById(user.getId())
                 .build();
 
-        String requestBody = objectMapper.writeValueAsString(newUser);
+        String requestBody = objectMapper.writeValueAsString(newProject);
 
-        mockMvc.perform(post("/api/users/")
+        MvcResult result = mockMvc.perform(post("/api/projects/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token)
                         .content(requestBody))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.username").value(newUser.getUsername()))
-                .andExpect(jsonPath("$.email").value(newUser.getEmail()));
+                .andExpect(jsonPath("$.name").value(newProject.getName()))
+                .andExpect(jsonPath("$.description").value(newProject.getDescription()))
+                .andExpect(jsonPath("$.createdById").value(user.getId()))
+                .andExpect(jsonPath("$.members").isArray())
+                .andExpect(jsonPath("$.members[0].userId").value(user.getId()))
+                .andExpect(jsonPath("$.members[0].role").value("ADMIN"))
+                .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+        projectId = objectMapper.readTree(responseBody).get("id").asLong();
     }
+
 
     @Test
     @Order(2)
-    @DisplayName("Update user - Success")
-    void updateUser_Success() throws Exception {
+    @DisplayName("Update project - Success")
+    void updateProject_Success() throws Exception {
         String token = tokenHolder.getToken();
         Assertions.assertNotNull(token, "The authentication token must not be null");
         Assertions.assertFalse(token.isBlank(), "The authentication token must not be empty");
 
-        UserDto newUser = UserDto.builder()
-                .username("tempuser")
-                .email("tempuser@pmt.com")
-                .password("TempPass123!")
+        // Get the connected user
+        User user = userRepository.findByEmail("testuser@pmt.com")
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        // Create a new project
+        ProjectDto initialProject = ProjectDto.builder()
+                .name("Initial Project")
+                .description("Description initiale")
+                .startDate(LocalDate.now())
+                .createdById(user.getId())
                 .build();
 
-        String requestBody = objectMapper.writeValueAsString(newUser);
+        String initialRequestBody = objectMapper.writeValueAsString(initialProject);
 
-        MvcResult result = mockMvc.perform(post("/api/users/")
+        MvcResult result = mockMvc.perform(post("/api/projects/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token)
-                        .content(requestBody))
+                        .content(initialRequestBody))
                 .andExpect(status().isCreated())
                 .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
-        Long userId = objectMapper.readTree(responseBody).get("id").asLong();
+        Long projectId = objectMapper.readTree(responseBody).get("id").asLong();
 
-        UserDto updatedUser = UserDto.builder()
-                .username("updateduser")
-                .email("updateduser@pmt.com")
-                .password("UpdatedPass123!")
+        // Update the project
+        ProjectDto updatedProject = ProjectDto.builder()
+                .name("Updated Project")
+                .description("Description mise à jour")
+                .startDate(LocalDate.now().plusDays(10))
+                .createdById(user.getId())
                 .build();
 
-        String updateRequestBody = objectMapper.writeValueAsString(updatedUser);
+        String updateRequestBody = objectMapper.writeValueAsString(updatedProject);
 
-        mockMvc.perform(put("/api/users/{id}", userId)
+        mockMvc.perform(put("/api/projects/{id}", projectId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token)
                         .content(updateRequestBody))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(userId))
-                .andExpect(jsonPath("$.username").value(updatedUser.getUsername()))
-                .andExpect(jsonPath("$.email").value(updatedUser.getEmail()));
+                .andExpect(jsonPath("$.id").value(projectId))
+                .andExpect(jsonPath("$.name").value(updatedProject.getName()))
+                .andExpect(jsonPath("$.description").value(updatedProject.getDescription()))
+                .andExpect(jsonPath("$.startDate").value(updatedProject.getStartDate().toString()));
     }
 
     @Test
     @Order(3)
-    @DisplayName("Get user by ID - Success")
-    void getUserById_Success() throws Exception {
+    @DisplayName("Get project by ID - Success")
+    void getProjectById_Success() throws Exception {
         String token = tokenHolder.getToken();
         Assertions.assertNotNull(token, "The authentication token must not be null");
         Assertions.assertFalse(token.isBlank(), "The authentication token must not be empty");
 
-        UserDto newUser = UserDto.builder()
-                .username("getbyiduser")
-                .email("tempuser@pmt.com")
-                .password("TempPass123!")
-                .build();
-
-        String requestBody = objectMapper.writeValueAsString(newUser);
-
-        MvcResult result = mockMvc.perform(post("/api/users/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
-                        .content(requestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        String responseBody = result.getResponse().getContentAsString();
-        Long userId = objectMapper.readTree(responseBody).get("id").asLong();
-
-        mockMvc.perform(get("/api/users/{id}", userId)
+        // Get the project by ID
+        mockMvc.perform(get("/api/projects/{id}", projectId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(userId))
-                .andExpect(jsonPath("$.username").value(newUser.getUsername()))
-                .andExpect(jsonPath("$.email").value(newUser.getEmail()));
+                .andExpect(jsonPath("$.id").value(projectId))
+                .andExpect(jsonPath("$.name").value("Test Project"))
+                .andExpect(jsonPath("$.description").value("Description du projet de test"));
     }
-
     @Test
     @Order(4)
-    @DisplayName("Get all users - Success")
-    void getAllUsers_Success() throws Exception {
+    @DisplayName("Get all projects - Success")
+    void getAllProjects_Success() throws Exception {
         String token = tokenHolder.getToken();
         Assertions.assertNotNull(token, "The authentication token must not be null");
         Assertions.assertFalse(token.isBlank(), "The authentication token must not be empty");
 
-        // Get all users
-        mockMvc.perform(get("/api/users/")
+        // Get all projects
+        mockMvc.perform(get("/api/projects/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
@@ -159,42 +174,22 @@ public class UserIntegrationTests {
 
     @Test
     @Order(5)
-    @DisplayName("Delete user - Success")
-    void deleteUser_Success() throws Exception {
+    @DisplayName("Delete project - Success")
+    void deleteProject_Success() throws Exception {
         String token = tokenHolder.getToken();
         Assertions.assertNotNull(token, "The authentication token must not be null");
         Assertions.assertFalse(token.isBlank(), "The authentication token must not be empty");
 
-        // Create a user to delete
-        UserDto newUser = UserDto.builder()
-                .username("deleteuser")
-                .email("deleteuser@pmt.com")
-                .password("DeletePass123!")
-                .build();
-
-        String requestBody = objectMapper.writeValueAsString(newUser);
-
-        MvcResult result = mockMvc.perform(post("/api/users/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token)
-                        .content(requestBody))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        String responseBody = result.getResponse().getContentAsString();
-        Long userId = objectMapper.readTree(responseBody).get("id").asLong();
-
-        // Delete the user
-        mockMvc.perform(delete("/api/users/{id}", userId)
+        // Delete the project
+        mockMvc.perform(delete("/api/projects/{id}", projectId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
 
-        // Check if the user is deleted
-        mockMvc.perform(get("/api/users/{id}", userId)
+        // Check if the project is deleted
+        mockMvc.perform(get("/api/projects/{id}", projectId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound());
     }
-
 }

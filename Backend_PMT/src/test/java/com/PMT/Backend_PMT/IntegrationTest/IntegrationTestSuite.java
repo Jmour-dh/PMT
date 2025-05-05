@@ -48,6 +48,9 @@ public class IntegrationTestSuite {
     @Autowired
     private UserIntegrationTests userIntegrationTests;
 
+    @Autowired
+    private ProjectIntegrationTests projectIntegrationTests;
+
     @BeforeAll
     void initializeDatabase() {
         userRepository.deleteAll();
@@ -64,5 +67,19 @@ public class IntegrationTestSuite {
     @Order(2)
     void runUserIntegrationTests() throws Exception {
         userIntegrationTests.createUser_Success();
+        userIntegrationTests.updateUser_Success();
+        userIntegrationTests.getUserById_Success();
+        userIntegrationTests.getAllUsers_Success();
+        userIntegrationTests.deleteUser_Success();
+    }
+
+    @Test
+    @Order(3)
+    void runProjectIntegrationTests() throws Exception {
+        projectIntegrationTests.createProject_Success();
+        projectIntegrationTests.updateProject_Success();
+        projectIntegrationTests.getProjectById_Success();
+        projectIntegrationTests.getAllProjects_Success();
+        projectIntegrationTests.deleteProject_Success();
     }
 }
