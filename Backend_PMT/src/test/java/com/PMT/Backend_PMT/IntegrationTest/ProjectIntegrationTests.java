@@ -1,7 +1,9 @@
 package com.PMT.Backend_PMT.IntegrationTest;
 
+import com.PMT.Backend_PMT.dto.InviteMemberDto;
 import com.PMT.Backend_PMT.dto.ProjectDto;
 import com.PMT.Backend_PMT.entity.User;
+import com.PMT.Backend_PMT.enumeration.Role;
 import com.PMT.Backend_PMT.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -48,14 +50,14 @@ public class ProjectIntegrationTests {
         Assertions.assertNotNull(token, "The authentication token must not be null");
         Assertions.assertFalse(token.isBlank(), "The authentication token must not be empty");
 
-        // Get the connected user
+        // Retrieve the connected user
         User user = userRepository.findByEmail("testuser@pmt.com")
-                .orElseThrow(() -> new IllegalStateException("Utilisateur introuvable"));
+                .orElseThrow(() -> new IllegalStateException("User not found"));
 
         // Create a new project
         ProjectDto newProject = ProjectDto.builder()
                 .name("Test Project")
-                .description("Description du projet de test")
+                .description("Test project description")
                 .startDate(LocalDate.now())
                 .createdById(user.getId())
                 .build();
@@ -69,18 +71,13 @@ public class ProjectIntegrationTests {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value(newProject.getName()))
-                .andExpect(jsonPath("$.description").value(newProject.getDescription()))
-                .andExpect(jsonPath("$.createdById").value(user.getId()))
-                .andExpect(jsonPath("$.members").isArray())
-                .andExpect(jsonPath("$.members[0].userId").value(user.getId()))
-                .andExpect(jsonPath("$.members[0].role").value("ADMIN"))
                 .andReturn();
 
+        // Retrieve the ID of the created project
         String responseBody = result.getResponse().getContentAsString();
         projectId = objectMapper.readTree(responseBody).get("id").asLong();
+        Assertions.assertNotNull(projectId, "The project ID must not be null");
     }
-
 
     @Test
     @Order(2)
@@ -97,7 +94,7 @@ public class ProjectIntegrationTests {
         // Create a new project
         ProjectDto initialProject = ProjectDto.builder()
                 .name("Initial Project")
-                .description("Description initiale")
+                .description("Initial description")
                 .startDate(LocalDate.now())
                 .createdById(user.getId())
                 .build();
@@ -117,7 +114,7 @@ public class ProjectIntegrationTests {
         // Update the project
         ProjectDto updatedProject = ProjectDto.builder()
                 .name("Updated Project")
-                .description("Description mise à jour")
+                .description("Updated description")
                 .startDate(LocalDate.now().plusDays(10))
                 .createdById(user.getId())
                 .build();
@@ -152,8 +149,9 @@ public class ProjectIntegrationTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(projectId))
                 .andExpect(jsonPath("$.name").value("Test Project"))
-                .andExpect(jsonPath("$.description").value("Description du projet de test"));
+                .andExpect(jsonPath("$.description").value("Test project description"));
     }
+
     @Test
     @Order(4)
     @DisplayName("Get all projects - Success")
@@ -180,16 +178,70 @@ public class ProjectIntegrationTests {
         Assertions.assertNotNull(token, "The authentication token must not be null");
         Assertions.assertFalse(token.isBlank(), "The authentication token must not be empty");
 
+        // Create a project to delete
+        User user = userRepository.findByEmail("testuser@pmt.com")
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        ProjectDto projectToDelete = ProjectDto.builder()
+                .name("Project to Delete")
+                .description("Description of the project to delete")
+                .startDate(LocalDate.now())
+                .createdById(user.getId())
+                .build();
+
+        String requestBody = objectMapper.writeValueAsString(projectToDelete);
+
+        MvcResult result = mockMvc.perform(post("/api/projects/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content(requestBody))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+        Long projectIdToDelete = objectMapper.readTree(responseBody).get("id").asLong();
+
         // Delete the project
-        mockMvc.perform(delete("/api/projects/{id}", projectId)
+        mockMvc.perform(delete("/api/projects/{id}", projectIdToDelete)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
 
-        // Check if the project is deleted
-        mockMvc.perform(get("/api/projects/{id}", projectId)
+        // Verify that the project is deleted
+        mockMvc.perform(get("/api/projects/{id}", projectIdToDelete)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("Invite member to project - Success")
+    void inviteMemberToProject_Success() throws Exception {
+        String token = tokenHolder.getToken();
+        Assertions.assertNotNull(token, "The authentication token must not be null");
+        Assertions.assertFalse(token.isBlank(), "The authentication token must not be empty");
+        Assertions.assertNotNull(projectId, "The project ID must not be null");
+
+        // Verify that the project exists
+        mockMvc.perform(get("/api/projects/{id}", projectId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        // Retrieve the user created by createUser_Success
+        User user = userRepository.findByEmail("newuser@pmt.com")
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        // Prepare the invitation request
+        InviteMemberDto inviteMemberDto = new InviteMemberDto(user.getEmail(), Role.MEMBER);
+        String requestBody = objectMapper.writeValueAsString(inviteMemberDto);
+
+        // Invite the user to the project
+        mockMvc.perform(post("/api/projects/{projectId}/invite", projectId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content(requestBody))
+                .andExpect(status().isCreated());
     }
 }

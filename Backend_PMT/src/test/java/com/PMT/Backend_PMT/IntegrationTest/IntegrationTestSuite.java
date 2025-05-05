@@ -81,5 +81,6 @@ public class IntegrationTestSuite {
         projectIntegrationTests.getProjectById_Success();
         projectIntegrationTests.getAllProjects_Success();
         projectIntegrationTests.deleteProject_Success();
+        projectIntegrationTests.inviteMemberToProject_Success();
     }
 }
