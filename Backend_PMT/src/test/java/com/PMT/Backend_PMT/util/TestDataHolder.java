@@ -9,5 +9,5 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestDataHolder {
     private Long projectId;
-
+    private Long taskIdUpdated;
 }

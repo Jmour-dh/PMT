@@ -135,6 +135,7 @@ public class TaskIntegrationTests {
                 .andExpect(jsonPath("$.dueDate").value(updatedDueDate.toString()))
                 .andExpect(jsonPath("$.priority").value(updatedTask.getPriority().toString()))
                 .andExpect(jsonPath("$.status").value(updatedTask.getStatus().toString()));
+        testDataHolder.setTaskIdUpdated(taskId);
     }
 
     @Test
@@ -283,5 +284,29 @@ public class TaskIntegrationTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(taskId))
                 .andExpect(jsonPath("$.assigneeId").value(user.getId()));
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("Get task history - Success")
+    void getTaskHistory_Success() throws Exception {
+        String token = tokenHolder.getToken();
+        Assertions.assertNotNull(token, "The authentication token must not be null");
+
+        Long taskIdUpdated = testDataHolder.getTaskIdUpdated();
+        Assertions.assertNotNull(taskIdUpdated, "The taskIdUpdated must be defined before running this test.");
+
+        mockMvc.perform(get("/api/task-history/{taskId}", taskIdUpdated)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").isNotEmpty())
+                .andExpect(jsonPath("$[0].changedField").exists())
+                .andExpect(jsonPath("$[0].oldValue").exists())
+                .andExpect(jsonPath("$[0].newValue").exists())
+                .andExpect(jsonPath("$[0].modificationDate").exists())
+                .andExpect(jsonPath("$[0].modifiedByUsername").exists());
     }
 }
