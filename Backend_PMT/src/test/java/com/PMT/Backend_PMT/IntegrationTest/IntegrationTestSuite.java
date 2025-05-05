@@ -95,6 +95,13 @@ public class IntegrationTestSuite {
     @Order(4)
     void runTaskIntegrationTests() throws Exception {
         taskIntegrationTests.createTask_Success();
+        taskIntegrationTests.updateTask_Success();
+        taskIntegrationTests.getTaskById_Success();
+        taskIntegrationTests.getAllTasks_Success();
+        taskIntegrationTests.deleteTask_Success();
+        taskIntegrationTests.assignTaskToProject_Success();
     }
+
+
 
 }
