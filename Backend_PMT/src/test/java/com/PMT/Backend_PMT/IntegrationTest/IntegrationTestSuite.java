@@ -3,6 +3,7 @@ package com.PMT.Backend_PMT.IntegrationTest;
 import com.PMT.Backend_PMT.dto.AuthDto;
 import com.PMT.Backend_PMT.entity.User;
 import com.PMT.Backend_PMT.repository.UserRepository;
+import com.PMT.Backend_PMT.util.TestDataHolder;
 import com.PMT.Backend_PMT.util.TokenHolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -37,6 +38,9 @@ public class IntegrationTestSuite {
     private TokenHolder tokenHolder;
 
     @Autowired
+    private TestDataHolder testDataHolder;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -50,6 +54,9 @@ public class IntegrationTestSuite {
 
     @Autowired
     private ProjectIntegrationTests projectIntegrationTests;
+
+    @Autowired
+    private TaskIntegrationTests taskIntegrationTests;
 
     @BeforeAll
     void initializeDatabase() {
@@ -83,4 +90,11 @@ public class IntegrationTestSuite {
         projectIntegrationTests.deleteProject_Success();
         projectIntegrationTests.inviteMemberToProject_Success();
     }
+
+    @Test
+    @Order(4)
+    void runTaskIntegrationTests() throws Exception {
+        taskIntegrationTests.createTask_Success();
+    }
+
 }

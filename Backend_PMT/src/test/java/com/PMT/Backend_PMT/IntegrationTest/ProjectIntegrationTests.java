@@ -40,6 +40,9 @@ public class ProjectIntegrationTests {
     @Autowired
     private com.PMT.Backend_PMT.util.TokenHolder tokenHolder;
 
+    @Autowired
+    private com.PMT.Backend_PMT.util.TestDataHolder testDataHolder;
+
     private Long projectId;
 
     @Test
@@ -73,9 +76,11 @@ public class ProjectIntegrationTests {
                 .andExpect(jsonPath("$.id").exists())
                 .andReturn();
 
+
         // Retrieve the ID of the created project
         String responseBody = result.getResponse().getContentAsString();
         projectId = objectMapper.readTree(responseBody).get("id").asLong();
+        testDataHolder.setProjectId(projectId);
         Assertions.assertNotNull(projectId, "The project ID must not be null");
     }
 
@@ -151,6 +156,7 @@ public class ProjectIntegrationTests {
                 .andExpect(jsonPath("$.name").value("Test Project"))
                 .andExpect(jsonPath("$.description").value("Test project description"));
     }
+
 
     @Test
     @Order(4)
