@@ -1189,5 +1189,4 @@ export class ProjectDetailsComponent implements OnInit {
     });
 }
 
-
 }

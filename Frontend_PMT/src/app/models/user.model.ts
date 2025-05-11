@@ -3,7 +3,13 @@ export interface User {
   username: string;
   email: string;
   createdAt: string;
-  createdProjects: Project[];
+  createdProjects: Array<{
+    id: number;
+    name: string;
+    description: string;
+    startDate: string;
+    createdById: number;
+  }>;
   memberProjects: Project[];
   assignedTasks: Task[];
 }

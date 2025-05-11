@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 import { formatDate } from '@angular/common';
 
 export enum TaskPriority {
@@ -54,6 +54,8 @@ export interface Project {
 })
 export class ProjectService {
   constructor(private http: HttpClient) { }
+  private projectCreatedSource = new Subject<void>();
+  projectCreated$ = this.projectCreatedSource.asObservable();
 
   getAllProjects(): Observable<Project[]> {
     const token = localStorage.getItem('token');
@@ -70,7 +72,7 @@ export class ProjectService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
-    return this.http.get<Project>(`/api/projects/${id}`, { headers });
+    return this.http.get<Project>(`/api/projects/${id}`, { headers })
   }
 
   createProject(project: any): Observable<Project> {
@@ -85,7 +87,11 @@ export class ProjectService {
       startDate: formatDate(project.startDate, 'yyyy-MM-dd', 'fr-FR')
     };
 
-    return this.http.post<Project>('/api/projects/', formattedProject, { headers });
+    return this.http.post<Project>('/api/projects/', formattedProject, { headers }).pipe(
+      tap(() =>{
+        this.projectCreatedSource.next();
+      })
+    )
   }
 
   updateProject(project: any): Observable<Project> {

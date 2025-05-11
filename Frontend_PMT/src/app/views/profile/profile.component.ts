@@ -107,30 +107,39 @@ import { ProjectService } from '../../services/project.service';
         <div class="content-wrapper">
           <!-- Projects Section -->
           <section class="content-section">
-            <div class="section-title">
-              <i class="fas fa-folder"></i>
-              <h2>Mes Projets</h2>
-            </div>
-            <div class="projects-list">
-              <div
-                *ngFor="let project of userProfile?.memberProjects"
-                class="project-item"
-              >
-                <div
-                  class="delete-icon"
-                  (click)="confirmDeleteProject(project.id)"
-                >
-                  🗑️
-                </div>
-                <div class="edit-icon" (click)="openEditModal(project)">✏️</div>
+  <div class="section-title">
+    <i class="fas fa-folder"></i>
+    <h2>Mes Projets</h2>
+  </div>
+  <div class="projects-list">
+    <div
+      *ngFor="let project of userProfile?.memberProjects"
+      class="project-item"
+    >
+      <!-- Affiche l'icône de suppression uniquement si l'utilisateur est le créateur -->
+      <div
+        class="delete-icon"
+        (click)="confirmDeleteProject(project.id)"
+        *ngIf="isCreatorOfProject(project)"
+      >
+        🗑️
+      </div>
+      <!-- Affiche l'icône d'édition uniquement si l'utilisateur est le créateur -->
+      <div
+        class="edit-icon"
+        (click)="openEditModal(project)"
+        *ngIf="isCreatorOfProject(project)"
+      >
+        ✏️
+      </div>
 
-                <div class="project-main">
-                  <h3>{{ project.name }}</h3>
-                  <p class="project-description">{{ project.description }}</p>
-                </div>
-              </div>
-            </div>
-          </section>
+      <div class="project-main">
+        <h3>{{ project.name }}</h3>
+        <p class="project-description">{{ project.description }}</p>
+      </div>
+    </div>
+  </div>
+</section>
 
           <!-- Tasks Section -->
           <section class="content-section">
@@ -700,6 +709,7 @@ export class ProfileComponent implements OnInit {
   isEditMode = false;
   showDeletePopup = false;
   isDeleting = false;
+  isCreator = false;
 
   constructor(
     private userService: UserService,
@@ -891,5 +901,9 @@ export class ProfileComponent implements OnInit {
         },
       });
     }
+  }
+
+  isCreatorOfProject(project: any): boolean {
+    return project.createdById === this.userProfile?.id;
   }
 }

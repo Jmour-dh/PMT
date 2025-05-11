@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ProjectService, Project } from '../../services/project.service';
 import { UserService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
@@ -221,12 +221,16 @@ export class DashboardComponent implements OnInit {
   constructor(
     private projectService: ProjectService,
     private userService: UserService,
+    private cdr: ChangeDetectorRef
   ) {
   }
 
   ngOnInit(): void {
     this.loadProjects();
     this.loadUserProjects();
+    this.projectService.projectCreated$.subscribe(() => {
+      this.refreshProjects();
+    });
   }
 
   loadProjects(): void {
@@ -261,5 +265,6 @@ export class DashboardComponent implements OnInit {
   refreshProjects(): void {
     this.loadProjects();
     this.loadUserProjects();
+    this.cdr.detectChanges(); 
   }
 }
