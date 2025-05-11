@@ -1,0 +1,330 @@
+<div class="project-details-container">
+    <div *ngIf="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Chargement en cours...</p>
+    </div>
+
+    <div *ngIf="!isLoading && project" class="project-content">
+      <div class="project-header">
+        <h1 class="project-title">{{ project.name }}</h1>
+        <p class="project-description">{{ project.description }}</p>
+      </div>
+
+      <div class="project-info">
+        <div class="info-section">
+          <h2>Informations générales</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Date de début</span>
+              <span class="info-value">{{
+                project.startDate | date : 'dd/MM/yyyy'
+              }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Nombre de membres</span>
+              <span class="info-value">{{
+                project.members.length || 0
+              }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Nombre total de tâches</span>
+              <span class="info-value">{{ project.tasks.length || 0 }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="members-section">
+          <h2>Membres du projet</h2>
+          <div class="members-list">
+            <div *ngFor="let member of project.members" class="member-card">
+              <div class="member-avatar">
+                {{ member.username.charAt(0).toUpperCase() }}
+              </div>
+              <div class="member-info">
+                <span class="member-name">{{ member.username }}</span>
+                <span class="member-role">{{ member.role }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tasks-section">
+          <h2>Tâches</h2>
+          <div class="tasks-grid">
+            <div class="task-column">
+              <h3>Tâches à faire</h3>
+              <div class="task-list">
+                <div
+                  *ngFor="let task of todoTasks"
+                  class="task-card"
+                  (click)="openTaskHistoryModal(task.id)"
+                >
+                  <div
+                    class="edit-icon"
+                    *ngIf="!isObserver"
+                    (click)="openEditModal($event, task)"
+                  >
+                    ✏️
+                  </div>
+                  <div class="title-span">
+                    <div>
+                      <h4>{{ task.title }}</h4>
+                    </div>
+                    <div
+                      *ngIf="!task.assigneeId"
+                      class="unassigned-icon"
+                      (click)="openAssignTaskModal($event, task.id)"
+                    >
+                      <span>⚠️</span>
+                      <div class="tooltip-text">Tâche non assignée</div>
+                    </div>
+                  </div>
+
+                  <p>{{ task.description }}</p>
+                  <div class="task-meta">
+                    <span class="task-assignee" *ngIf="task.assigneeId">
+                      Assigné à: {{ getUsernameById(task.assigneeId) }}
+                    </span>
+                    <div class="task-details-row">
+                      <span class="task-due-date" *ngIf="task.dueDate">
+                        Date d'échéance:
+                        {{ task.dueDate | date : 'dd/MM/yyyy' }}
+                      </span>
+                      <span
+                        class="task-priority"
+                        [ngClass]="'priority-' + task.priority?.toLowerCase()"
+                      >
+                        Priorité: {{ task.priority }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="task-column">
+              <h3>Tâches en cours</h3>
+              <div class="task-list">
+                <div
+                  *ngFor="let task of inProgressTasks"
+                  class="task-card"
+                  (click)="openTaskHistoryModal(task.id)"
+                >
+                  <div
+                    class="edit-icon"
+                    *ngIf="!isObserver"
+                    (click)="openEditModal($event, task)"
+                  >
+                    ✏️
+                  </div>
+                  <div class="title-span">
+                    <div>
+                      <h4>{{ task.title }}</h4>
+                    </div>
+                    <div
+                      *ngIf="!task.assigneeId"
+                      class="unassigned-icon"
+                      (click)="openAssignTaskModal($event, task.id)"
+                    >
+                      <span>⚠️</span>
+                      <div class="tooltip-text">Tâche non assignée</div>
+                    </div>
+                  </div>
+                  <p>{{ task.description }}</p>
+                  <div class="task-meta">
+                    <span class="task-assignee" *ngIf="task.assigneeId">
+                      Assigné à: {{ getUsernameById(task.assigneeId) }}
+                    </span>
+                    <div class="task-details-row">
+                      <span class="task-due-date" *ngIf="task.dueDate">
+                        Échéance: {{ task.dueDate | date : 'dd/MM/yyyy' }}
+                      </span>
+                      <span
+                        class="task-priority"
+                        [ngClass]="'priority-' + task.priority?.toLowerCase()"
+                      >
+                        Priorité: {{ task.priority }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="task-column">
+              <h3>Tâches terminées</h3>
+              <div class="task-list">
+                <div
+                  *ngFor="let task of doneTasks"
+                  class="task-card"
+                  (click)="openTaskHistoryModal(task.id)"
+                >
+                  <div
+                    class="edit-icon"
+                    *ngIf="!isObserver"
+                    (click)="openEditModal($event, task)"
+                  >
+                    ✏️
+                  </div>
+                  <div class="title-span">
+                    <div>
+                      <h4>{{ task.title }}</h4>
+                    </div>
+                    <div
+                      *ngIf="!task.assigneeId"
+                      class="unassigned-icon"
+                      (click)="openAssignTaskModal($event, task.id)"
+                    >
+                      <span>⚠️</span>
+                      <div class="tooltip-text">Tâche non assignée</div>
+                    </div>
+                  </div>
+
+                  <p>{{ task.description }}</p>
+                  <div class="task-meta">
+                    <span class="task-assignee" *ngIf="task.assigneeId">
+                      Assigné à: {{ getUsernameById(task.assigneeId) }}
+                    </span>
+                    <div class="task-details-row">
+                      <span class="task-due-date" *ngIf="task.dueDate">
+                        Terminé le: {{ task.dueDate | date : 'dd/MM/yyyy' }}
+                      </span>
+                      <span
+                        class="task-priority"
+                        [ngClass]="'priority-' + task.priority?.toLowerCase()"
+                      >
+                        Priorité: {{ task.priority }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && !project" class="error-message">
+      <p>Projet non trouvé</p>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <div class="fab-container" *ngIf="!isObserver">
+        <div class="fab-menu" [class.open]="isFabOpen">
+          <button
+            class="fab-item"
+            (click)="openInviteMember()"
+            *ngIf="!isMember"
+          >
+            <span class="fab-icon">👥</span>
+            <span class="fab-label">Inviter un membre</span>
+          </button>
+          <button class="fab-item" (click)="openCreateTaskModal()">
+            <span class="fab-icon">➕</span>
+            <span class="fab-label">Créer une tâche</span>
+          </button>
+        </div>
+        <button class="fab-button" (click)="toggleFab()">
+          <span class="fab-icon">⚙️</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal de création de tâche -->
+    <app-create-task-modal
+      *ngIf="showCreateTaskModal"
+      [taskToEdit]="selectedTask"
+      [isEditMode]="isEditMode"
+      (close)="closeCreateTaskModal()"
+      (taskCreated)="handleTaskCreated(); loadProjectDetails(project!.id)"
+      (taskUpdated)="handleTaskUpdated(); loadProjectDetails(project!.id)"
+    ></app-create-task-modal>
+
+    <div class="toast" *ngIf="showSuccessToast" [@fadeInOut]>
+      <span class="toast-icon">✅</span>
+      <span class="toast-message">Invitation envoyée avec succès</span>
+    </div>
+
+    <div class="toast" *ngIf="showSuccessToastTask">
+      <span class="toast-icon">✅</span>
+      <span class="toast-message">Tâche créée avec succès</span>
+    </div>
+
+    <div class="toast-update" *ngIf="showSuccessUpdateToastTask">
+      <span class="toast-icon">✅</span>
+      <span class="toast-message">Tâche est mise à jour</span>
+    </div>
+
+    <div class="toast-delete" *ngIf="showSuccessDeleteToastTask">
+      <span class="toast-icon">✅</span>
+      <span class="toast-message">Tâche supprimé avec succès</span>
+    </div>
+
+    <div class="toast" *ngIf="showSuccessToastTaskAssigned">
+      <span class="toast-icon">✅</span>
+      <span class="toast-message">Tâche assignée avec succès</span>
+    </div>
+    <div
+      class="modal-overlay"
+      *ngIf="showInviteModal"
+      (click)="closeInviteModal()"
+    >
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h2>Inviter un membre</h2>
+        <form (ngSubmit)="submitInvitation()">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              [(ngModel)]="inviteEmail"
+              name="email"
+              required
+              placeholder="Entrez l'email du membre"
+              [class.error]="errorMessage"
+            />
+          </div>
+          <div class="form-group">
+            <label for="role">Rôle</label>
+            <select id="role" [(ngModel)]="selectedRole" name="role" required>
+              <option *ngFor="let role of roles" [value]="role">
+                {{ role }}
+              </option>
+            </select>
+          </div>
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="cancel-btn"
+              (click)="closeInviteModal()"
+            >
+              Annuler
+            </button>
+            <button type="submit" class="submit-btn">Inviter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- ModalAssignComponent -->
+    <app-modal-assign
+      *ngIf="showAssignTaskModal"
+      [members]="project?.members ?? []"
+      [taskId]="selectedTaskId"
+      [projectId]="project?.id ?? null"
+      (closeModal)="closeAssignTaskModal()"
+      (taskAssigned)="onTaskAssigned(); loadProjectDetails(project!.id)"
+    ></app-modal-assign>
+
+    <app-task-history-modal
+      *ngIf="showTaskHistoryModal"
+      [project]="currentProject"
+      [taskId]="selectedTaskId"
+      (close)="onModalClose()"
+      (deleteTask)="handleDeleteTask($event)"
+    >
+    </app-task-history-modal>
+  </div>

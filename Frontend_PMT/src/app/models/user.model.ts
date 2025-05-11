@@ -18,6 +18,11 @@ export interface Project {
   id: number;
   name: string;
   description: string;
+  startDate: string;
+  createdById: number;
+  members: any[];
+  tasks: Task[];
+  project: Project; 
 }
 
 export interface Task {
