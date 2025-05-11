@@ -1,0 +1,189 @@
+<div class="profile-wrapper">
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Chargement en cours...</p>
+    </div>
+
+    <div class="profile-sidebar">
+      <div class="user-card">
+        <div class="user-avatar">
+          <div class="avatar-initial">
+            {{ userProfile?.username?.charAt(0)?.toUpperCase() }}
+          </div>
+        </div>
+        <div class="user-info">
+          <h2>{{ userProfile?.username }}</h2>
+          <p class="user-email">{{ userProfile?.email }}</p>
+          <div class="user-stats">
+            <div class="stat-item">
+              <span class="stat-number">{{
+                userProfile?.memberProjects?.length || 0
+              }}</span>
+              <span class="stat-label">Projets</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">{{
+                userProfile?.assignedTasks?.length || 0
+              }}</span>
+              <span class="stat-label">Tâches</span>
+            </div>
+          </div>
+          <div class="join-date">
+            <i class="fas fa-calendar-alt"></i>
+            Membre depuis {{ userProfile?.createdAt | date : 'dd/MM/yyyy' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Edit Form -->
+      <div class="profile-edit-section">
+        <h3>Modifier le profil</h3>
+        <form (ngSubmit)="onSubmit()" #profileForm="ngForm">
+          <div class="form-group">
+            <label for="username">Nom d'utilisateur</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              [(ngModel)]="editForm.username"
+              class="form-control"
+              placeholder="Nouveau nom d'utilisateur"
+              (input)="checkFormChanges()"
+            />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="editForm.email"
+              class="form-control"
+              placeholder="Nouvel email"
+              (input)="checkFormChanges()"
+            />
+          </div>
+          <button
+            type="submit"
+            class="btn-save"
+            [disabled]="!profileForm.form.valid || isUpdating || !hasChanges"
+          >
+            <span *ngIf="!isUpdating">Enregistrer</span>
+            <span *ngIf="isUpdating">
+              <span class="button-spinner"></span>
+              Enregistrement...
+            </span>
+          </button>
+          <div *ngIf="updateError" class="error-message">
+            {{ updateError }}
+          </div>
+          <div *ngIf="updateSuccess" class="success-message">
+            Profil mis à jour avec succès
+          </div>
+        </form>
+      </div>
+      <div class="section-delete">
+        <button class="btn-delete" (click)="openDeleteConfirmation()">
+          Clôturer compte
+        </button>
+      </div>
+    </div>
+
+    <div class="profile-main">
+      <div class="content-wrapper">
+        <!-- Projects Section -->
+        <section class="content-section">
+          <div class="section-title">
+            <i class="fas fa-folder"></i>
+            <h2>Mes Projets</h2>
+          </div>
+          <div class="projects-list">
+            <div
+              *ngFor="let project of userProfile?.memberProjects"
+              class="project-item"
+            >
+              <div
+                class="delete-icon"
+                (click)="confirmDeleteProject(project.id)"
+                *ngIf="isCreatorOfProject(project)"
+              >
+                🗑️
+              </div>
+              <div
+                class="edit-icon"
+                (click)="openEditModal(project)"
+                *ngIf="isCreatorOfProject(project)"
+              >
+                ✏️
+              </div>
+
+              <div class="project-main">
+                <h3>{{ project.name }}</h3>
+                <p class="project-description">{{ project.description }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tasks Section -->
+        <section class="content-section">
+          <div class="section-title">
+            <i class="fas fa-tasks"></i>
+            <h2>Mes Tâches</h2>
+          </div>
+          <div class="tasks-list">
+            <div *ngIf="userProfile?.assignedTasks?.length; else noTasks">
+              <div
+                *ngFor="let task of userProfile?.assignedTasks"
+                class="task-item"
+              >
+                <div class="task-main">
+                  <div class="task-header">
+                    <h3>{{ task.title }}</h3>
+                    <div
+                      class="task-status"
+                      [ngClass]="'status-' + task.status.toLowerCase()"
+                    >
+                      {{ task.status }}
+                    </div>
+                  </div>
+                  <p class="task-description">{{ task.description }}</p>
+                </div>
+              </div>
+            </div>
+            <ng-template #noTasks>
+              <div class="empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <p>Aucune tâche assignée pour le moment</p>
+              </div>
+            </ng-template>
+          </div>
+        </section>
+      </div>
+    </div>
+    <app-create-project-modal
+      *ngIf="showCreateProjectModal"
+      [projectToEdit]="selectedProject"
+      [isEditMode]="isEditMode"
+      (close)="closeCreateProjectModal()"
+      (projectUpdated)="handleProjectUpdated()"
+    ></app-create-project-modal>
+    <!-- Popup de confirmation -->
+    <div *ngIf="showDeletePopup" class="popup-overlay">
+      <div class="popup">
+        <p>
+          Êtes-vous sûr de vouloir clôturer votre compte ? Cette action est
+          irréversible.
+        </p>
+        <div class="popup-actions">
+          <button class="btn-confirm" (click)="confirmDelete()">
+            Confirmer
+          </button>
+          <button class="btn-cancel" (click)="closeDeleteConfirmation()">
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
