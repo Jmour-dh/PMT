@@ -29,6 +29,8 @@ export interface Task {
 } 
 
 export interface MemberProjects {
+  name: string;
+  description: string;
   id: number;
   username: string;
   role: 'ADMIN' | 'MEMBER' | 'OBSERVER';

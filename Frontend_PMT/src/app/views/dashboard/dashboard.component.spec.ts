@@ -71,7 +71,7 @@ describe('DashboardComponent', () => {
       email: 'test@example.com',
       createdAt: '',
       createdProjects: [],
-      memberProjects: [{ id: 1, username: 'testuser', role: 'MEMBER' }],
+      memberProjects: [{ id: 1, username: 'testuser', role: 'MEMBER', name: 'Project 1', description: '' }],
       assignedTasks: [],
     };
     mockUserService.getUserProfile.and.returnValue(of(mockUser));
