@@ -10,7 +10,7 @@ export interface User {
     startDate: string;
     createdById: number;
   }>;
-  memberProjects: Project[];
+  memberProjects: MemberProjects[];
   assignedTasks: Task[];
 }
 
@@ -27,3 +27,9 @@ export interface Task {
   status: 'TODO' | 'IN_PROGRESS' | 'DONE';
   project: Project;
 } 
+
+export interface MemberProjects {
+  id: number;
+  username: string;
+  role: 'ADMIN' | 'MEMBER' | 'OBSERVER';
+}

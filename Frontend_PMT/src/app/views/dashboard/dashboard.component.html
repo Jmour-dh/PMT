@@ -1,0 +1,45 @@
+<div class="dashboard-container">
+    <h1 class="dashboard-title">Tableau de bord des projets</h1>
+    
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement des projets...</p>
+    </div>
+    
+    <div *ngIf="!isLoading && projects.length === 0" class="no-projects">
+      <p>Aucun projet n'est disponible pour le moment.</p>
+    </div>
+    
+    <div class="projects-grid" *ngIf="!isLoading && projects.length > 0">
+      <div *ngFor="let project of projects" class="project-card">
+        <div class="project-header">
+          <h2 class="project-name">{{ project.name }}</h2>
+        </div>
+        
+        <p class="project-description">{{ project.description }}</p>
+        
+        <div class="project-info">
+          <div class="info-item">
+            <span class="info-label">Membres</span>
+            <span class="info-value">{{ project.members.length || 0 }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Tâches</span>
+            <span class="info-value">{{ project.tasks.length || 0 }}</span>
+          </div>
+        </div>
+        
+        <div class="project-dates">
+          <span>Date de début: {{ project.startDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+        
+        <div class="project-actions">
+          <a *ngIf="isUserMemberOfProject(project)" 
+             [routerLink]="['/projects', project.id]"
+             class="details-link">
+            Voir les détails
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>

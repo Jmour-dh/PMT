@@ -9,41 +9,36 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './signin.component.html',
-  styleUrls: ['./signin.component.css']
+  styleUrls: ['./signin.component.css'],
 })
 export class SigninComponent {
   credentials = {
     email: '',
-    password: ''
+    password: '',
   };
   errorMessage = '';
   isLoading = false;
 
-  constructor(
-    private authService: AuthService
-  ) {}
+  constructor(private authService: AuthService) {}
 
   onSignIn() {
     if (this.isLoading) return;
-    
+
     this.isLoading = true;
     this.errorMessage = '';
-    console.log('Tentative de connexion avec:', this.credentials);
-
-    this.authService.login(this.credentials.email, this.credentials.password)
+    this.authService
+      .login(this.credentials.email, this.credentials.password)
       .subscribe({
         next: (token) => {
-        
-          
           this.errorMessage = '';
           this.authService.handleLoginSuccess(token);
           this.isLoading = false;
         },
         error: (error) => {
           console.error('Erreur détaillée:', error);
-          this.isLoading = false;
           this.errorMessage = 'Email ou mot de passe incorrect';
-        }
+          this.isLoading = false;
+        },
       });
   }
 }
