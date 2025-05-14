@@ -1,0 +1,51 @@
+services:
+  mysql-db:
+    image: mysql:lts
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: pmt_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3308:3306" 
+    networks:
+      - pmt-network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -uroot -proot || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+
+  backend:
+    build: ./Backend_PMT
+    container_name: backend
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - pmt-network
+
+  frontend:
+    build: ./Frontend_PMT
+    container_name: frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:8080/api
+    networks:
+      - pmt-network
+    volumes:
+      - ./Frontend_PMT:/app
+      - /app/node_modules
+
+volumes:
+  mysql-data:
+
+networks:
+  pmt-network:
+    driver: bridge
