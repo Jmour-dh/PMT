@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-test:
@@ -21,39 +21,42 @@ jobs:
         options: --health-cmd="mysqladmin ping -uroot -proot" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    # ===== Backend (Spring Boot) =====
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      # ===== Backend (Spring Boot) =====
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
 
-    - name: Build Backend with Maven
-      working-directory: ./Backend_PMT
-      run: mvn clean package -DskipTests
+      - name: Build Backend with Maven
+        working-directory: ./Backend_PMT
+        run: mvn clean package -DskipTests
 
-    # ===== Frontend (Angular) =====
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+      - name: Run Backend Tests
+        working-directory: ./Backend_PMT
+        mvn clean test
 
-    - name: Install Angular CLI
-      working-directory: ./Frontend_PMT
-      run: npm install -g @angular/cli
+      # ===== Frontend (Angular) =====
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
 
-    - name: Install Frontend Dependencies
-      working-directory: ./Frontend_PMT
-      run: npm install
+      - name: Install Angular CLI
+        working-directory: ./Frontend_PMT
+        run: npm install -g @angular/cli
 
-    - name: Run Frontend Tests
-      working-directory: ./Frontend_PMT
-      run: ng test --watch=false --browsers=ChromeHeadless
+      - name: Install Frontend Dependencies
+        working-directory: ./Frontend_PMT
+        run: npm install
 
-    - name: Build Frontend
-      working-directory: ./Frontend_PMT
-      run: ng build --configuration=production
+      - name: Run Frontend Tests
+        working-directory: ./Frontend_PMT
+        run: ng test --watch=false --browsers=ChromeHeadless
 
+      - name: Build Frontend
+        working-directory: ./Frontend_PMT
+        run: ng build --configuration=production
