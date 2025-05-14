@@ -59,8 +59,9 @@ public class IntegrationTestSuite {
     private TaskIntegrationTests taskIntegrationTests;
 
     @BeforeAll
-    void initializeDatabase() {
+    void initializeDatabase() throws Exception {
         userRepository.deleteAll();
+        authIntegrationTests.loginUser_Success();
     }
 
     @Test
