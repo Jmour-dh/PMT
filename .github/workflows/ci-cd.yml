@@ -37,7 +37,7 @@ jobs:
 
       - name: Run Backend Tests
         working-directory: ./Backend_PMT
-        run: mvn clean test
+        run: mvn clean test -Dspring.profiles.active=test
 
       # ===== Frontend (Angular) =====
       - name: Set up Node.js
