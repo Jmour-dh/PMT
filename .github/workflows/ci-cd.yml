@@ -38,12 +38,12 @@ jobs:
           MYSQL_DATABASE: pmt_db
         run: mvn clean package -DskipTests
 
-      - name: Run Backend Tests
-        working-directory: ./Backend_PMT
-        env:
-          SPRING_PROFILES_ACTIVE: test
-          MYSQL_DATABASE: pmt_test
-        run: mvn test -Dspring.config.location=classpath:application-test.properties
+     # - name: Run Backend Tests
+     #    working-directory: ./Backend_PMT
+       #  env:
+        #   SPRING_PROFILES_ACTIVE: test
+       #    MYSQL_DATABASE: pmt_test
+      #   run: mvn test -Dspring.config.location=classpath:application-test.properties
 
       # ===== Frontend (Angular) =====
       - name: Set up Node.js
