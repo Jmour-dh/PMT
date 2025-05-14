@@ -43,7 +43,7 @@ public class AuthIntegrationTests {
     private TokenHolder tokenHolder;
 
     @BeforeAll
-    void loginUser_Success() throws Exception {
+    public void loginUser_Success() throws Exception {
 
         if (!userRepository.existsByEmail("testuser@pmt.com")) {
             userRepository.save(User.builder()
