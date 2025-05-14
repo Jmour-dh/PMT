@@ -33,11 +33,17 @@ jobs:
 
       - name: Build Backend with Maven
         working-directory: ./Backend_PMT
+        env:
+          SPRING_PROFILES_ACTIVE: dev # Utilisez 'test' pour les tests
+          MYSQL_DATABASE: pmt_db
         run: mvn clean package -DskipTests
 
-     # - name: Run Backend Tests
-      #  working-directory: ./Backend_PMT
-      #  run: mvn test -Dspring.config.location=classpath:application-h2.properties
+      - name: Run Backend Tests
+        working-directory: ./Backend_PMT
+        env:
+          SPRING_PROFILES_ACTIVE: test
+          MYSQL_DATABASE: pmt_test
+        run: mvn test -Dspring.config.location=classpath:application-test.properties
 
       # ===== Frontend (Angular) =====
       - name: Set up Node.js
@@ -55,8 +61,12 @@ jobs:
 
       - name: Run Frontend Tests
         working-directory: ./Frontend_PMT
+        env:
+          NODE_ENV: test
         run: ng test --watch=false --browsers=ChromeHeadless
 
       - name: Build Frontend
         working-directory: ./Frontend_PMT
+        env:
+          NODE_ENV: production
         run: ng build --configuration=production
