@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:applicationTest.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AuthIntegrationTests {
 
     @Autowired
@@ -52,7 +53,6 @@ public class AuthIntegrationTests {
                     .passwordHash(passwordEncoder.encode("Testpass123!"))
                     .build());
         }
-
 
         AuthDto loginRequest = new AuthDto("testuser@pmt.com", "Testpass123!");
         String requestBody = objectMapper.writeValueAsString(loginRequest);
