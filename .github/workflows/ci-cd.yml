@@ -43,7 +43,7 @@ jobs:
         env:
           SPRING_PROFILES_ACTIVE: test
           MYSQL_DATABASE: pmt_test
-        run: mvn test -Dspring.config.location=classpath:application-test.properties
+        run: mvn -Dtest=IntegrationTestSuite test 
 
       # ===== Frontend (Angular) =====
       - name: Set up Node.js
