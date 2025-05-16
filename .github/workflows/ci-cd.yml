@@ -81,5 +81,5 @@ jobs:
       - name: Build and Push Docker Image
         if: github.ref == 'refs/heads/main'
         run: |
-        docker build -t dhiaeddinejm@gmail.com/spring-boot-profiles:latest .
-        docker push -VST:@k(68Jy9yU/spring-boot-profiles:latest
+          docker build -t dhiaeddinejm@gmail.com/spring-boot-profiles:latest .
+          docker push -VST:@k(68Jy9yU/spring-boot-profiles:latest
