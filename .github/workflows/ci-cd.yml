@@ -43,7 +43,7 @@ jobs:
         env:
           SPRING_PROFILES_ACTIVE: test
           MYSQL_DATABASE: pmt_test
-        run: mvn -Dtest=IntegrationTestSuite test 
+        run: mvn -Dtest="IntegrationTestSuite,AuthControllerTest,UserControllerTest,TaskHistoryControllerTest,TaskControllerTest,ProjectControllerTest,ProjectMemberControllerTest" test
 
       # ===== Frontend (Angular) =====
       - name: Set up Node.js
