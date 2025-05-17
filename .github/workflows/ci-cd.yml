@@ -78,9 +78,21 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push Docker Image
+      - name: Build and Push Backend and Frontend Docker Images
         if: github.ref == 'refs/heads/main'
         run: |
-          IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/spring-boot-profiles:latest
-          docker build -t $IMAGE_NAME
-          docker push $IMAGE_NAME
+          BACKEND_IMAGE=${{ secrets.DOCKER_USERNAME }}/spring-boot-backend:latest
+          FRONTEND_IMAGE=${{ secrets.DOCKER_USERNAME }}/angular-frontend:latest
+
+          echo "Building backend image: $BACKEND_IMAGE"
+          docker build -t $BACKEND_IMAGE ./Backend_PMT
+
+          echo "Building frontend image: $FRONTEND_IMAGE"
+          docker build -t $FRONTEND_IMAGE ./Frontend_PMT
+
+          echo "Pushing backend image..."
+          docker push $BACKEND_IMAGE
+
+          echo "Pushing frontend image..."
+          docker push $FRONTEND_IMAGE
+
