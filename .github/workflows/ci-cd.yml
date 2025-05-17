@@ -70,16 +70,17 @@ jobs:
         env:
           NODE_ENV: production
         run: ng build --configuration=production
-      
+
       - name: Docker Login
         if: github.ref == 'refs/heads/main'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-    
+
       - name: Build and Push Docker Image
         if: github.ref == 'refs/heads/main'
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/spring-boot-profiles:latest ./Backend_PMT
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/spring-boot-profiles:latest
+          IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/spring-boot-profiles:latest
+          docker build -t $IMAGE_NAME ./Backend_PMT
+          docker push $IMAGE_NAME
