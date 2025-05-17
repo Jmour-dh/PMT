@@ -82,5 +82,5 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/spring-boot-profiles:latest
-          docker build -t $IMAGE_NAME ./Backend_PMT
+          docker build -t $IMAGE_NAME
           docker push $IMAGE_NAME
