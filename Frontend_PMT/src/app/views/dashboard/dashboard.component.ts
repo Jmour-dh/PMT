@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ProjectService, Project } from '../../services/project/project.service';
-import { UserService } from '../../services/user.service';
+import { UserService } from '../../services/user/user.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 

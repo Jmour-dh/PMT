@@ -4,7 +4,7 @@ import { ProjectService, Project, Role } from '../../services/project/project.se
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { UserService } from '../../services/user.service';
+import { UserService } from '../../services/user/user.service';
 import { CreateTaskModalComponent } from '../../components/create-task-modal/create-task-modal.component';
 import { ModalAssignComponent } from '../../components/modal-assign/modal-assign.component';
 import { TaskHistoryModalComponent } from '../../components/task-history-modal/task-history-modal.component';

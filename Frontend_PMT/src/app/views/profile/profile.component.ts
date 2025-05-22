@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserService } from '../../services/user.service';
+import { UserService } from '../../services/user/user.service';
 import { User, Project, Task } from '../../models/user.model';
 import { CreateProjectModalComponent } from '../../components/create-project-modal/create-project-modal.component';
 import { ProjectService } from '../../services/project/project.service';

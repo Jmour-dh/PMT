@@ -1,7 +1,7 @@
 import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
 import { ProjectService } from '../../services/project/project.service';
-import { UserService } from '../../services/user.service';
+import { UserService } from '../../services/user/user.service';
 import { of, throwError } from 'rxjs';
 import { ChangeDetectorRef } from '@angular/core';
 import { User } from '../../models/user.model';
