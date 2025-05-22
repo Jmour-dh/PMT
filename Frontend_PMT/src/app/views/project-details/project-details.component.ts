@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { ProjectService, Project, Role } from '../../services/project.service';
+import { ProjectService, Project, Role } from '../../services/project/project.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -8,7 +8,7 @@ import { UserService } from '../../services/user.service';
 import { CreateTaskModalComponent } from '../../components/create-task-modal/create-task-modal.component';
 import { ModalAssignComponent } from '../../components/modal-assign/modal-assign.component';
 import { TaskHistoryModalComponent } from '../../components/task-history-modal/task-history-modal.component';
-import { TaskService } from '../../services/Task.service';
+import { TaskService } from '../../services/task/Task.service';
 
 @Component({
   selector: 'app-project-details',

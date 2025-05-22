@@ -1,6 +1,6 @@
 import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
-import { ProjectService } from '../../services/project.service';
+import { ProjectService } from '../../services/project/project.service';
 import { UserService } from '../../services/user.service';
 import { of, throwError } from 'rxjs';
 import { ChangeDetectorRef } from '@angular/core';
@@ -29,12 +29,12 @@ describe('DashboardComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('devrait créer le composant', () => {
+  it('should create the component', () => {
     // This test ensures that the component is created successfully.
     expect(component).toBeTruthy();
   });
 
-  it('devrait charger les projets avec succès', fakeAsync(() => {
+  it('should load projects successfully', fakeAsync(() => {
     // This test verifies that the component correctly loads projects
     // when the API call is successful.
     const mockProjects = [
@@ -50,9 +50,7 @@ describe('DashboardComponent', () => {
     expect(component.isLoading).toBeFalse();
   }));
 
-  it('devrait gérer une erreur lors du chargement des projets', fakeAsync(() => {
-    // This test checks that the component handles errors correctly
-    // when the API call to load projects fails.
+  it('should handle an error when loading projects', fakeAsync(() => {
     mockProjectService.getAllProjects.and.returnValue(throwError(() => new Error('Erreur API')));
 
     component.loadProjects();
@@ -62,9 +60,7 @@ describe('DashboardComponent', () => {
     expect(component.isLoading).toBeFalse();
   }));
 
-  it('devrait charger les projets utilisateur avec succès', fakeAsync(() => {
-    // This test verifies that the component correctly loads user-specific projects
-    // when the API call is successful.
+  it('should load user projects successfully', fakeAsync(() => {
     const mockUser: User = {
       id: 1,
       username: 'testuser',
@@ -82,9 +78,7 @@ describe('DashboardComponent', () => {
     expect(component.userProjectIds).toEqual([1]);
   }));
 
-  it('devrait gérer une erreur lors du chargement des projets utilisateur', fakeAsync(() => {
-    // This test ensures that the component handles errors correctly
-    // when the API call to load user-specific projects fails.
+  it('should handle an error when loading user projects', fakeAsync(() => {
     mockUserService.getUserProfile.and.returnValue(throwError(() => new Error('Erreur API')));
 
     component.loadUserProjects();
@@ -93,9 +87,7 @@ describe('DashboardComponent', () => {
     expect(component.userProjectIds).toEqual([]);
   }));
 
-  it('devrait vérifier si un utilisateur est membre d\'un projet', () => {
-    // This test checks if the method correctly identifies whether a user
-    // is a member of a specific project based on their project IDs.
+  it('should check if a user is a member of a project', () => {
     component.userProjectIds = [1, 2, 3];
     const project = { id: 2, name: 'Project 2', description: '', startDate: '', createdById: 1, members: [], tasks: [] };
 
@@ -104,9 +96,7 @@ describe('DashboardComponent', () => {
     expect(isMember).toBeTrue();
   });
 
-  it('devrait rafraîchir les projets', fakeAsync(() => {
-    // This test ensures that the refreshProjects method calls the necessary
-    // methods to reload projects and user projects, and triggers change detection.
+  it('should refresh projects', fakeAsync(() => {
     spyOn(component, 'loadProjects');
     spyOn(component, 'loadUserProjects');
     const cdrSpy = spyOn(component['cdr'], 'detectChanges');

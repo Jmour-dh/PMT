@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { TaskService } from '../../services/Task.service';
+import { TaskService } from '../../services/task/Task.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import { EnvironmentService } from './environment.service';
+import { EnvironmentService } from '../environment.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,9 +19,11 @@ export class AuthService {
     this.checkAuth();
   }
 
-  private checkAuth() {
+  public checkAuth() {
     const token = localStorage.getItem('token');
     this.isAuthenticatedSubject.next(!!token);
+    console.log('AuthService initialized, isAuthenticated:', this.isAuthenticatedSubject.value);
+    
   }
 
   isAuthenticated(): boolean {
@@ -33,6 +35,10 @@ export class AuthService {
       `${this.environmentService.getApiUrl()}/auth/login`, 
       { email, password },
       { responseType: 'text' }
+    ).pipe(
+      tap((token: string) => {
+        this.handleLoginSuccess(token); 
+      })
     );
   }
 

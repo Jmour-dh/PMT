@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { TaskService } from '../../services/Task.service';
+import { TaskService } from '../../services/task/Task.service';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 

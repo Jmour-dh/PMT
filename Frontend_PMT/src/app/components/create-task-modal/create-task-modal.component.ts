@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TaskPriority, TaskStatus } from '../../services/project.service';
+import { TaskPriority, TaskStatus } from '../../services/project/project.service';
 import { UserService } from '../../services/user.service';
 import { ActivatedRoute } from '@angular/router';
-import { TaskService } from '../../services/Task.service';
+import { TaskService } from '../../services/task/Task.service';
 
 @Component({
   selector: 'app-create-task-modal',
