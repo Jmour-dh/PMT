@@ -1,0 +1,112 @@
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          {{
+            isEditMode
+              ? 'Mettre à jour cette tâche'
+              : 'Créer une nouvelle tâche'
+          }}
+        </h2>
+        <button class="close-btn" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form
+        (ngSubmit)="onSubmit($event)"
+        #taskForm="ngForm"
+        class="task-form"
+      >
+        <div class="form-group">
+          <label for="title">Titre</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            [(ngModel)]="task.title"
+            required
+            class="form-control"
+            placeholder="Entrez le titre de la tâche"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="task.description"
+            required
+            class="form-control"
+            placeholder="Décrivez la tâche"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="priority">Priorité</label>
+          <select
+            id="priority"
+            name="priority"
+            [(ngModel)]="task.priority"
+            required
+            class="form-control"
+          >
+            <option *ngFor="let priority of priorities" [value]="priority">
+              {{ priority }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="status">Statut</label>
+          <select
+            id="status"
+            name="status"
+            [(ngModel)]="task.status"
+            required
+            class="form-control"
+          >
+            <option *ngFor="let status of statuses" [value]="status">
+              {{ status }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="dueDate">Date d'échéance</label>
+          <input
+            type="date"
+            id="dueDate"
+            name="dueDate"
+            [(ngModel)]="task.dueDate"
+            required
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-cancel" (click)="closeModal()">
+            Annuler
+          </button>
+          <button
+            type="submit"
+            class="btn btn-submit"
+            [disabled]="!taskForm.valid || isLoading"
+          >
+            <span *ngIf="!isLoading">{{
+              isEditMode ? 'Mettre à jour' : 'Créer la tâche'
+            }}</span>
+            <span *ngIf="isLoading">
+              <i class="fas fa-spinner fa-spin"></i>
+              {{
+                isEditMode
+                  ? 'Mise à jour en cours...'
+                  : 'Création en cours...'
+              }}
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
