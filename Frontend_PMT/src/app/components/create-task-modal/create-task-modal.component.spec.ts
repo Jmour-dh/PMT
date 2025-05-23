@@ -72,15 +72,14 @@ describe('CreateTaskModalComponent', () => {
   });
 
   it('should initialize with default values', () => {
-    // Dans ce cas, nous testons le comportement après l'initialisation complète
     expect(component.task).toEqual({
       title: '',
       description: '',
       priority: TaskPriority.MEDIUM,
       status: TaskStatus.TODO,
       dueDate: '',
-      createdById: 1, // Maintenant nous nous attendons à 1 car loadCurrentUser a été appelé
-      projectId: 1,   // Et projectId est chargé depuis la route
+      createdById: 1, 
+      projectId: 1,   
     });
     expect(component.priorities).toEqual(Object.values(TaskPriority));
     expect(component.statuses).toEqual(Object.values(TaskStatus));

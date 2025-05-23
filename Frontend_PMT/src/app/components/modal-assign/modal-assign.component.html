@@ -1,0 +1,31 @@
+<div class="modal-overlay" (click)="closeModal.emit()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Assigner un membre</h2>
+      <div class="members-list">
+        <div
+          *ngFor="let member of members"
+          class="member-card"
+          (click)="selectMember(member.userId)"
+          [class.selected]="selectedMemberId === member.userId"
+        >
+          <div class="member-info">
+            <span class="member-name">{{ member.username }}</span>
+            <span class="member-role">{{ member.role }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="cancel-btn" (click)="closeModal.emit()">
+          Annuler
+        </button>
+        <button
+          type="button"
+          class="submit-btn"
+          [disabled]="!selectedMemberId"
+          (click)="assignTask()"
+        >
+          Assigner
+        </button>
+      </div>
+    </div>
+  </div>
