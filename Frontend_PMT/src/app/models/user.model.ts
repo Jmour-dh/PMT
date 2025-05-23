@@ -22,7 +22,7 @@ export interface Project {
   createdById: number;
   members: any[];
   tasks: Task[];
-  project: Project; 
+  //project: Project; 
 }
 
 export interface Task {

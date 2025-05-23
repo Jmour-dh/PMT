@@ -1,0 +1,83 @@
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{
+            isEditMode ? 'Mettre à jour ce projet':'Créer un nouveau projet'
+          }}
+            </h2>
+        <button class="close-btn" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form
+        (ngSubmit)="onSubmit($event)"
+        #projectForm="ngForm"
+        class="project-form"
+      >
+        <div class="form-group">
+          <label for="name">Nom du projet</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="project.name"
+            required
+            class="form-control"
+            placeholder="Entrez le nom du projet"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="project.description"
+            required
+            class="form-control"
+            placeholder="Décrivez votre projet"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="startDate">Date de début</label>
+          <div class="date-picker">
+            <input
+              type="date"
+              id="startDate"
+              name="startDate"
+              [(ngModel)]="project.startDate"
+              required
+              class="form-control"
+            />
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-cancel" (click)="closeModal()">
+            Annuler
+          </button>
+          <button
+            type="submit"
+            class="btn btn-submit"
+            [disabled]="!projectForm.valid || isLoading"
+          >
+            <span *ngIf="!isLoading">{{
+              isEditMode ? 'Mettre à jour' : 'Créer le projet'
+            }}</span>
+            <span *ngIf="isLoading">
+              <i class="fas fa-spinner fa-spin"></i>
+              {{
+                isEditMode
+                  ? 'Mise à jour en cours...'
+                  : 'Création en cours...'
+              }}
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
