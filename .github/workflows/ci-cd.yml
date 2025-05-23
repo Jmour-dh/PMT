@@ -34,7 +34,7 @@ jobs:
       - name: Build Backend with Maven
         working-directory: ./Backend_PMT
         env:
-          SPRING_PROFILES_ACTIVE: dev # Utilisez 'test' pour les tests
+          SPRING_PROFILES_ACTIVE: dev
           MYSQL_DATABASE: pmt_db
         run: mvn clean package -DskipTests
 

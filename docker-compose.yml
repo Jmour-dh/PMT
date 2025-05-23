@@ -12,10 +12,10 @@ services:
     networks:
       - pmt-network
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -uroot -proot || exit 1"]
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-proot"]
       interval: 5s
-      timeout: 10s
-      retries: 30
+      timeout: 3s
+      retries: 10
 
   backend:
     build: ./Backend_PMT
