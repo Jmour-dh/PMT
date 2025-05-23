@@ -17,7 +17,7 @@ describe('CreateTaskModalComponent', () => {
   const mockActivatedRoute = {
     snapshot: {
       paramMap: {
-        get: (key: string) => '1', // Simule un projectId = 1
+        get: (key: string) => '1',
       },
     },
   };

@@ -1,0 +1,28 @@
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Historique des modifications</h2>
+        <button class="close-btn" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+<ul *ngIf="!isLoading && taskHistory.length > 0" class="history-list">
+  <li *ngFor="let entry of taskHistory">
+    <strong>{{ entry.changedField }}</strong> changé de
+    <em>{{ entry.oldValue }}</em> à <em>{{ entry.newValue }}</em> par
+    {{ entry.modifiedByUsername }} le
+    {{ entry.modificationDate | date : 'short' }}.
+  </li>
+</ul>
+<p *ngIf="!isLoading && taskHistory.length === 0" class="no-history">
+  Aucun historique disponible.
+</p>
+</div>
+<div class="modal-footer" *ngIf="isAdmin">
+<button class="btn btn-delete"  (click)="onDeleteTask()">
+  Supprimer la tâche
+</button>
+</div>
+  </div>

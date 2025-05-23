@@ -54,7 +54,7 @@ describe('ModalAssignComponent', () => {
   it('should initialize with correct values', () => {
     expect(component.members).toEqual(mockMembers);
     expect(component.taskId).toBe(456);
-    expect(component.projectId).toBe(123); // Chargé depuis la route
+    expect(component.projectId).toBe(123); 
     expect(component.selectedMemberId).toBeNull();
   });
 
