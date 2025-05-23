@@ -1,0 +1,27 @@
+<header class="header">
+    <div class="header-container">
+      <div class="logo" (click)="goToDashboard()">
+        <h1>PMT</h1>
+      </div>
+      <nav class="nav-menu">
+        <button class="nav-btn create-project" (click)="openCreateProjectModal()">
+          <i class="fas fa-plus"></i>
+          <span class="btn-text">Créer un projet</span>
+        </button>
+        <button class="nav-btn" (click)="goToProfile()">
+          <i class="fas fa-user"></i>
+          <span class="btn-text">Mon compte</span>
+        </button>
+        <button class="nav-btn logout" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="btn-text">Déconnexion</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <app-create-project-modal 
+    *ngIf="showCreateProjectModal" 
+    (close)="closeCreateProjectModal()"
+    (projectCreated)="onProjectCreated()"
+  ></app-create-project-modal>

@@ -1,4 +1,9 @@
-import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
+import {
+  TestBed,
+  ComponentFixture,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
 import { ProjectService } from '../../services/project/project.service';
 import { UserService } from '../../services/user/user.service';
@@ -13,7 +18,10 @@ describe('DashboardComponent', () => {
   let mockUserService: jasmine.SpyObj<UserService>;
 
   beforeEach(async () => {
-    mockProjectService = jasmine.createSpyObj('ProjectService', ['getAllProjects', 'projectCreated$']);
+    mockProjectService = jasmine.createSpyObj('ProjectService', [
+      'getAllProjects',
+      'projectCreated$',
+    ]);
     mockUserService = jasmine.createSpyObj('UserService', ['getUserProfile']);
 
     await TestBed.configureTestingModule({
@@ -30,16 +38,29 @@ describe('DashboardComponent', () => {
   });
 
   it('should create the component', () => {
-    // This test ensures that the component is created successfully.
     expect(component).toBeTruthy();
   });
 
   it('should load projects successfully', fakeAsync(() => {
-    // This test verifies that the component correctly loads projects
-    // when the API call is successful.
     const mockProjects = [
-      { id: 1, name: 'Project 1', description: '', startDate: '', createdById: 1, members: [], tasks: [] },
-      { id: 2, name: 'Project 2', description: '', startDate: '', createdById: 2, members: [], tasks: [] },
+      {
+        id: 1,
+        name: 'Project 1',
+        description: '',
+        startDate: '',
+        createdById: 1,
+        members: [],
+        tasks: [],
+      },
+      {
+        id: 2,
+        name: 'Project 2',
+        description: '',
+        startDate: '',
+        createdById: 2,
+        members: [],
+        tasks: [],
+      },
     ];
     mockProjectService.getAllProjects.and.returnValue(of(mockProjects));
 
@@ -51,7 +72,9 @@ describe('DashboardComponent', () => {
   }));
 
   it('should handle an error when loading projects', fakeAsync(() => {
-    mockProjectService.getAllProjects.and.returnValue(throwError(() => new Error('Erreur API')));
+    mockProjectService.getAllProjects.and.returnValue(
+      throwError(() => new Error('Erreur API'))
+    );
 
     component.loadProjects();
     tick();
@@ -67,7 +90,15 @@ describe('DashboardComponent', () => {
       email: 'test@example.com',
       createdAt: '',
       createdProjects: [],
-      memberProjects: [{ id: 1, username: 'testuser', role: 'MEMBER', name: 'Project 1', description: '' }],
+      memberProjects: [
+        {
+          id: 1,
+          username: 'testuser',
+          role: 'MEMBER',
+          name: 'Project 1',
+          description: '',
+        },
+      ],
       assignedTasks: [],
     };
     mockUserService.getUserProfile.and.returnValue(of(mockUser));
@@ -79,7 +110,9 @@ describe('DashboardComponent', () => {
   }));
 
   it('should handle an error when loading user projects', fakeAsync(() => {
-    mockUserService.getUserProfile.and.returnValue(throwError(() => new Error('Erreur API')));
+    mockUserService.getUserProfile.and.returnValue(
+      throwError(() => new Error('Erreur API'))
+    );
 
     component.loadUserProjects();
     tick();
@@ -89,7 +122,15 @@ describe('DashboardComponent', () => {
 
   it('should check if a user is a member of a project', () => {
     component.userProjectIds = [1, 2, 3];
-    const project = { id: 2, name: 'Project 2', description: '', startDate: '', createdById: 1, members: [], tasks: [] };
+    const project = {
+      id: 2,
+      name: 'Project 2',
+      description: '',
+      startDate: '',
+      createdById: 1,
+      members: [],
+      tasks: [],
+    };
 
     const isMember = component.isUserMemberOfProject(project);
 

@@ -32,7 +32,6 @@ export class MainLayoutComponent {
   constructor(private router: Router) {}
 
   onProjectCreated() {
-    // Rafraîchir la page actuelle
     const currentUrl = this.router.url;
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       this.router.navigate([currentUrl]);

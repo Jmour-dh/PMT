@@ -280,7 +280,7 @@ describe('CreateTaskModalComponent', () => {
       status: TaskStatus.TODO,
       dueDate: '',
       createdById: 0,
-      projectId: 1, // projectId doit être conservé
+      projectId: 1, 
     });
     expect(component.isEditMode).toBeFalse();
     expect(component.taskId).toBeNull();

@@ -14,7 +14,6 @@ describe('SigninComponent', () => {
   let router: Router;
 
   beforeEach(async () => {
-    // Create spy object for AuthService with required methods
     const authServiceSpy = jasmine.createSpyObj('AuthService', [
       'login', 
       'handleLoginSuccess'
@@ -42,12 +41,10 @@ describe('SigninComponent', () => {
     fixture.detectChanges();
   });
 
-  // Test 1: Component Creation
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // Test 2: Initial State
   it('should initialize with empty credentials and not loading', () => {
     expect(component.credentials.email).toBe('');
     expect(component.credentials.password).toBe('');
@@ -55,14 +52,12 @@ describe('SigninComponent', () => {
     expect(component.isLoading).toBeFalse();
   });
 
-  // Test 3: Prevent login when already loading
   it('should not call login when already loading', () => {
     component.isLoading = true;
     component.onSignIn();
     expect(authService.login).not.toHaveBeenCalled();
   });
 
-  // Test 4: Successful login
   it('should handle successful login', fakeAsync(() => {
     const mockToken = 'mock-token';
     authService.login.and.returnValue(of(mockToken));
@@ -73,16 +68,14 @@ describe('SigninComponent', () => {
     };
     
     component.onSignIn();
-    tick(); // Wait for async operations
+    tick();
     
-    // Verify service calls and state changes
     expect(authService.login).toHaveBeenCalledWith('test@example.com', 'password123');
     expect(authService.handleLoginSuccess).toHaveBeenCalledWith(mockToken);
     expect(component.isLoading).toBeFalse();
     expect(component.errorMessage).toBe('');
   }));
 
-  // Test 5: Failed login
   it('should handle failed login', fakeAsync(() => {
     authService.login.and.returnValue(throwError(() => new Error('Login failed')));
     
@@ -92,58 +85,12 @@ describe('SigninComponent', () => {
     };
     
     component.onSignIn();
-    tick(); // Wait for async operations
+    tick();
     
-    // Verify error handling
     expect(authService.login).toHaveBeenCalledWith('wrong@example.com', 'wrongpass');
     expect(authService.handleLoginSuccess).not.toHaveBeenCalled();
     expect(component.isLoading).toBeFalse();
     expect(component.errorMessage).toBe('Email ou mot de passe incorrect');
   }));
-
-//   // Test 6: Loading state during login
-//   it('should set loading state during login', fakeAsync(() => {
-//     const mockToken = 'mock-token';
-//     authService.login.and.returnValue(of(mockToken));
-    
-//     component.credentials = {
-//       email: 'test@example.com',
-//       password: 'password123'
-//     };
-    
-//     // Verify initial state
-//     expect(component.isLoading).toBeFalse();
-    
-//     component.onSignIn();
-    
-//     // Verify loading state during call
-//     expect(component.isLoading).toBeTrue();
-    
-//     tick(); // Complete async operation
-    
-//     // Verify loading state after completion
-//     expect(component.isLoading).toBeFalse();
-//   }));
-
-//   // Test 7: Error message clearing
-//   it('should set loading state during login', fakeAsync(() => {
-//     // Mock de authService.login
-//     authService.login.and.returnValue(of('mockToken').pipe(delay(100)));
-  
-//     // Vérifiez l'état initial
-//     expect(component.isLoading).toBeFalse();
-  
-//     // Déclenchez la connexion
-//     component.onSignIn();
-  
-//     // Vérifiez que l'état de chargement est défini immédiatement
-//     expect(component.isLoading).toBeTrue();
-  
-//     // Simulez l'écoulement du temps pour compléter l'observable
-//     tick(100);
-  
-//     // Vérifiez que l'état de chargement est réinitialisé après la complétion
-//     expect(component.isLoading).toBeFalse();
-//   }));
 
 });

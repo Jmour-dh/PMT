@@ -14,7 +14,7 @@ describe('ModalAssignComponent', () => {
   const mockActivatedRoute = {
     snapshot: {
       paramMap: {
-        get: (key: string) => '123', // Simule un projectId = 123
+        get: (key: string) => '123', 
       },
     },
   };
@@ -40,7 +40,6 @@ describe('ModalAssignComponent', () => {
     component = fixture.componentInstance;
     taskServiceSpy = TestBed.inject(TaskService) as jasmine.SpyObj<TaskService>;
     
-    // Initialisation des inputs
     component.members = mockMembers;
     component.taskId = 456;
     
@@ -82,18 +81,15 @@ describe('ModalAssignComponent', () => {
   });
 
   it('should not assign task if missing data', () => {
-    // Cas 1: projectId manquant
     component.projectId = null;
     component.assignTask();
     expect(taskServiceSpy.assignTask).not.toHaveBeenCalled();
 
-    // Cas 2: taskId manquant
     component.projectId = 123;
     component.taskId = null;
     component.assignTask();
     expect(taskServiceSpy.assignTask).not.toHaveBeenCalled();
 
-    // Cas 3: selectedMemberId manquant
     component.taskId = 456;
     component.selectedMemberId = null;
     component.assignTask();

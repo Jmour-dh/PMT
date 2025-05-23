@@ -1,5 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
@@ -12,19 +15,23 @@ describe('AuthService', () => {
   let router: Router;
 
   beforeEach(() => {
-    const environmentServiceSpy = jasmine.createSpyObj('EnvironmentService', ['getApiUrl']);
+    const environmentServiceSpy = jasmine.createSpyObj('EnvironmentService', [
+      'getApiUrl',
+    ]);
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, RouterTestingModule],
       providers: [
         AuthService,
-        { provide: EnvironmentService, useValue: environmentServiceSpy }
-      ]
+        { provide: EnvironmentService, useValue: environmentServiceSpy },
+      ],
     });
 
     service = TestBed.inject(AuthService);
     httpMock = TestBed.inject(HttpTestingController);
-    environmentService = TestBed.inject(EnvironmentService) as jasmine.SpyObj<EnvironmentService>;
+    environmentService = TestBed.inject(
+      EnvironmentService
+    ) as jasmine.SpyObj<EnvironmentService>;
     router = TestBed.inject(Router);
 
     environmentService.getApiUrl.and.returnValue('http://localhost:8080/api');
@@ -40,34 +47,37 @@ describe('AuthService', () => {
 
   it('should update isAuthenticated$ based on token presence in localStorage', (done) => {
     spyOn(localStorage, 'getItem').and.returnValue('fake-token');
-  
-    const service = TestBed.inject(AuthService); 
-  
-    service.checkAuth(); 
-  
+
+    const service = TestBed.inject(AuthService);
+
+    service.checkAuth();
+
     service.isAuthenticated$.subscribe((isAuthenticated) => {
-      expect(isAuthenticated).toBeTrue(); 
+      expect(isAuthenticated).toBeTrue();
       done();
     });
   });
 
   it('should handle login and update isAuthenticated$', (done) => {
     const mockResponse = 'fake-jwt-token';
-  
+
     spyOn(service, 'handleLoginSuccess').and.callThrough(); // Espionne handleLoginSuccess
-  
+
     service.login('testuser@example.com', 'password').subscribe(() => {
       expect(service.handleLoginSuccess).toHaveBeenCalledWith('fake-jwt-token'); // Vérifie que handleLoginSuccess est appelée
-  
+
       service.isAuthenticated$.subscribe((isAuthenticated) => {
         expect(isAuthenticated).toBeTrue(); // Vérifie que isAuthenticated$ est mis à jour
         done();
       });
     });
-  
+
     const req = httpMock.expectOne('http://localhost:8080/api/auth/login');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ email: 'testuser@example.com', password: 'password' });
+    expect(req.request.body).toEqual({
+      email: 'testuser@example.com',
+      password: 'password',
+    });
     req.flush(mockResponse); // Simule une réponse de l'API
   });
 
@@ -86,7 +96,7 @@ describe('AuthService', () => {
     expect(req.request.body).toEqual({
       email: 'testuser@example.com',
       username: 'testuser',
-      password: 'password'
+      password: 'password',
     });
   });
 });

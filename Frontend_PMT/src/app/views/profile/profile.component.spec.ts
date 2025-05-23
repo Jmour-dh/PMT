@@ -1,85 +1,147 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import { ProfileComponent } from './profile.component';
 import { UserService } from '../../services/user/user.service';
-import { ProjectService } from '../../services/project/project.service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HttpResponse } from '@angular/common/http';
+import { User } from '../../models/user.model';
 
 describe('ProfileComponent', () => {
-    let component: ProfileComponent;
-    let fixture: ComponentFixture<ProfileComponent>;
-    let userService: jasmine.SpyObj<UserService>;
-  
-    beforeEach(async () => {
-      // Create spy objects for UserService and ProjectService with mocked methods
-      const userServiceSpy = jasmine.createSpyObj('UserService', [
-        'getUserProfile',
-        'updateUserProfile',
-      ]);
+  let component: ProfileComponent;
+  let fixture: ComponentFixture<ProfileComponent>;
+  let userService: jasmine.SpyObj<UserService>;
 
-  
-      // Configure the testing module with necessary imports and providers
-      await TestBed.configureTestingModule({
-        imports: [ProfileComponent, HttpClientTestingModule], 
-        providers: [
-          { provide: UserService, useValue: userServiceSpy },
-        ],
-      }).compileComponents();
-  
-      // Create component instance and inject dependencies
-      fixture = TestBed.createComponent(ProfileComponent);
-      component = fixture.componentInstance;
-      userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+  const mockUser: User = {
+    id: 1,
+    username: 'testuser',
+    email: 'test@example.com',
+    createdAt: '2023-01-01',
+    createdProjects: [],
+    memberProjects: [],
+    assignedTasks: [],
+  };
+
+  beforeEach(async () => {
+    const userServiceSpy = jasmine.createSpyObj('UserService', [
+      'getUserProfile',
+      'updateUserProfile',
+      'deleteUserProfile',
+    ]);
+
+    await TestBed.configureTestingModule({
+      imports: [ProfileComponent, HttpClientTestingModule],
+      providers: [{ provide: UserService, useValue: userServiceSpy }],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(ProfileComponent);
+    component = fixture.componentInstance;
+    userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+  });
+
+  it('should create the component', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should load user profile via loadProfile', () => {
+    //Given
+    userService.getUserProfile.and.returnValue(of(mockUser));
+
+    //When
+    component.loadProfile();
+    // Then
+    expect(userService.getUserProfile).toHaveBeenCalled();
+    expect(component.userProfile).toEqual(mockUser);
+    expect(component.editForm.username).toBe(mockUser.username);
+    expect(component.editForm.email).toBe(mockUser.email);
+    expect(component.isLoading).toBeFalse();
+  });
+
+  it('should submit user profile updates via onSubmit', () => {
+    // Given
+    const mockResponse = new HttpResponse({ status: 200 });
+    const updatedUser = {
+      ...mockUser,
+      username: 'updateduser',
+      email: 'updated@example.com',
+    };
+
+    component.userProfile = { id: 1 } as User;
+    component.editForm = {
+      username: 'updateduser',
+      email: 'updated@example.com',
+    };
+
+    userService.updateUserProfile.and.returnValue(of(mockResponse));
+    userService.getUserProfile.and.returnValue(of(updatedUser));
+    // When
+    component.onSubmit();
+    // Then
+    expect(userService.updateUserProfile).toHaveBeenCalledWith(
+      '1',
+      component.editForm
+    );
+    expect(component.updateSuccess).toBeTrue();
+    expect(component.userProfile).toEqual(updatedUser);
+  });
+
+  it('should handle different error scenarios appropriately', fakeAsync(() => {
+    // Given
+    component.userProfile = { id: 1 } as User;
+
+    // Senario 1: 401 Unauthorized
+    //Given
+
+    userService.updateUserProfile.and.returnValue(
+      throwError(() => ({ status: 401 }))
+    );
+    //When
+    component.onSubmit();
+    tick();
+    //Then
+    expect(component.updateError).toContain('session a expiré');
+
+    // Scenario 2: 403 Forbidden
+    //Given
+    userService.updateUserProfile.and.returnValue(
+      throwError(() => ({ status: 403 }))
+    );
+    //When
+    component.onSubmit();
+    tick();
+
+    //Then
+    expect(component.updateError).toContain('permissions nécessaires');
+
+    // Scenario 3: 500 Internal Server Error
+    //Given
+    userService.updateUserProfile.and.returnValue(
+      throwError(() => ({ status: 500 }))
+    );
+    //When
+    component.onSubmit();
+    tick();
+    //Then
+    expect(component.updateError).toContain('erreur serveur');
+  }));
+
+  it('should set initial form values correctly', () => {
+    // Given
+    userService.getUserProfile.and.returnValue(of(mockUser));
+
+    // When
+    component.loadProfile();
+
+    // Then
+    expect(component.editForm.username).toBe(mockUser.username);
+    expect(component.editForm.email).toBe(mockUser.email);
+    expect(component.initialFormValues).toEqual({
+      username: mockUser.username,
+      email: mockUser.email,
     });
-  
-    // Test 1: Component creation
-    it('should create the component', () => {
-      expect(component).toBeTruthy(); 
-    });
-
-    // Test 2: Profile loading functionality
-    it('should load user profile via loadProfile', () => {
-      const mockUser = {
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        createdAt: '2023-01-01',
-        createdProjects: [],
-        memberProjects: [],
-        assignedTasks: [],
-      };
-      
-      userService.getUserProfile.and.returnValue(of(mockUser));
-
-      component.loadProfile();
-
-      expect(userService.getUserProfile).toHaveBeenCalled();
-      expect(component.userProfile).toEqual(mockUser);
-    });
-
-    // Test 3: Profile update functionality
-    it('should submit user profile updates via onSubmit', () => {
-      const mockResponse = new HttpResponse({ status: 200 });
-      const mockUser = {
-        id: 1,
-        username: 'updateduser',
-        email: 'updated@example.com',
-        createdAt: '2023-01-01',
-        createdProjects: [],
-        memberProjects: [],
-        assignedTasks: [],
-      };
-      
-      component.userProfile = { id: 1 } as any;
-      component.editForm = { username: 'updateduser', email: 'updated@example.com' };
-
-      userService.updateUserProfile.and.returnValue(of(mockResponse));
-      userService.getUserProfile.and.returnValue(of(mockUser));
-
-      component.onSubmit();
-
-      expect(userService.updateUserProfile).toHaveBeenCalledWith('1', component.editForm);
-      expect(component.updateSuccess).toBeTrue();
-    });
+  });
 });

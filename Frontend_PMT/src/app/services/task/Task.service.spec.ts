@@ -1,5 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { TaskService } from './Task.service';
 
 describe('TaskService', () => {
@@ -9,7 +12,7 @@ describe('TaskService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [TaskService]
+      providers: [TaskService],
     });
 
     service = TestBed.inject(TaskService);
@@ -34,10 +37,12 @@ describe('TaskService', () => {
     });
 
     // Then
-    const req = httpMock.expectOne(`${service['apiUrl']}${projectId}/${taskId}/assign/${userId}`);
+    const req = httpMock.expectOne(
+      `${service['apiUrl']}${projectId}/${taskId}/assign/${userId}`
+    );
     expect(req.request.method).toBe('PATCH');
     expect(req.request.headers.get('Authorization')).toContain('Bearer');
-    req.flush(mockResponse); // Simule une réponse HTTP
+    req.flush(mockResponse);
   });
 
   it('should call getTaskHistory and send a GET request', () => {
@@ -45,7 +50,7 @@ describe('TaskService', () => {
     const taskId = 1;
     const mockHistory = [
       { id: 1, action: 'Created', timestamp: '2023-01-01T12:00:00Z' },
-      { id: 2, action: 'Updated', timestamp: '2023-01-02T12:00:00Z' }
+      { id: 2, action: 'Updated', timestamp: '2023-01-02T12:00:00Z' },
     ];
 
     // When
@@ -58,7 +63,7 @@ describe('TaskService', () => {
     const req = httpMock.expectOne(`api/task-history/${taskId}`);
     expect(req.request.method).toBe('GET');
     expect(req.request.headers.get('Authorization')).toContain('Bearer');
-    req.flush(mockHistory); // Simule une réponse HTTP
+    req.flush(mockHistory);
   });
 
   it('should call updateTask and send a PUT request', () => {
@@ -78,7 +83,7 @@ describe('TaskService', () => {
     expect(req.request.method).toBe('PUT');
     expect(req.request.headers.get('Authorization')).toContain('Bearer');
     expect(req.request.body).toEqual(updatedTask);
-    req.flush(mockResponse); // Simule une réponse HTTP
+    req.flush(mockResponse);
   });
 
   it('should call deleteTask and send a DELETE request', () => {
@@ -94,9 +99,11 @@ describe('TaskService', () => {
     });
 
     // Then
-    const req = httpMock.expectOne(`${service['apiUrl']}${taskId}?userId=${userId}`);
+    const req = httpMock.expectOne(
+      `${service['apiUrl']}${taskId}?userId=${userId}`
+    );
     expect(req.request.method).toBe('DELETE');
     expect(req.request.headers.get('Authorization')).toContain('Bearer');
-    req.flush(mockResponse); // Simule une réponse HTTP
+    req.flush(mockResponse);
   });
 });

@@ -115,12 +115,12 @@ export class CreateTaskModalComponent {
 
     this.isLoading = true;
     if (this.isEditMode && this.taskId) {
-      // Mode édition : mise à jour de la tâche
+      // Edit Mode
       this.taskService.updateTask(this.taskId, taskToSend).subscribe({
         next: () => {
           this.isLoading = false;
           this.toastMessage = 'Tâche mise à jour avec succès';
-          this.toastColor = '#007bff'; // Couleur bleue
+          this.toastColor = '#007bff'; 
           this.showToast = true;
           this.taskUpdated.emit();
           this.resetForm();
@@ -132,7 +132,7 @@ export class CreateTaskModalComponent {
         },
       });
     } else {
-      // Mode création : création de la tâche
+      // Create Mode
       this.taskService.createTask(taskToSend).subscribe({
         next: () => {
           this.isLoading = false;
