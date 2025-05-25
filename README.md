@@ -2,6 +2,11 @@
 
 PMT est une plateforme de gestion de projet collaboratif destinée aux équipes de développement logiciel. L'objectif est de créer une application qui permettra aux équipes de planifier, suivre et collaborer sur des projets de manière efficace.
 
+## Phase de conception 
+Schéma de la base de donnée
+
+<img src="./screenshot\diagramme de classe.png" alt="diagramme de classe" >
+
 ## Préréquis
 
 - [Utiliser un éditeur de code](https://www.oracle.com/java/technologies/downloads/)
@@ -66,8 +71,8 @@ PMT est une plateforme de gestion de projet collaboratif destinée aux équipes 
 * Redémarrez votre ordinateur si demandé
 
 
-# Lancement du projet en local
-## Lancement du backend
+## Lancement du projet en local
+### Lancement du backend
 
 1. Après avoir installé Dbeaver, crée un serveur sur le port 3306 comme 
         sur l'image suivante :
@@ -112,7 +117,7 @@ Après l'exécution de la requette SQL, on observe l'apparition de la base des d
 Le backend va se lancer sur http://localhost:8080
 
 
-# Reference API
+## Reference API
 
 Pour documenter notre API REST, nous avons utilisé Swagger UI (OpenAPI), qui permet :
 
@@ -202,7 +207,7 @@ Naviguer dans le racine du projet pmt
 
 1. Lancer docker desktop 
 
-2. Lancer cette commande 
+2. Ouvrez un nouveau Terminal et lancez le script suivant : 
 
 ```bash
    docker-compose up --build
