@@ -79,7 +79,7 @@ Après l'exécution de la requette SQL, on observe l'apparition de la base des d
     git clone https://github.com/Jmour-dh/PMT.git
 ```
 
-3. Naviguez dans le dossier ressouces Backend_PMT
+3. Naviguez dans le dossier Backend_PMT
 4. Ouvrez un nouveau Terminal à la racine du projet puis naviguez vers le dossier Backend_PMT, et lancez le script suivant:
 
 
@@ -119,5 +119,19 @@ Ajoutez le token reçu dans l'en-tête Authorization de vos requêtes suivantes 
     <td><img src="./screenshot/step_6.png" alt="Step 6" width="100%"></td>
   </tr>
 </table>
+
+## Test backend
+1. Ouvrez un nouveau Terminal à la racine du projet puis naviguez vers le dossier Backend_PMT, et lancez le script suivant :
+
+```bash
+   mvn clean verify -Dtest="IntegrationTestSuite,AuthControllerTest,UserControllerTest,TaskHistoryControllerTest,TaskControllerTest,ProjectControllerTest,ProjectMemberControllerTest"
+```
+
+2. Pour voir le résultat, naviguez dans le dossier target comme indiqué sur l'image.
+<img src="./screenshot\step_8.png" alt="Step_8" >
+
+3. http://localhost:63342/Backend_PMT/target/site/jacoco/index.html?_ijt=3sc916tjg9l329jhb34otj227u&_ij_reload=RELOAD_ON_SAVE
+
+<img src="./screenshot\step_9.png" alt="Step_9" >
 
 

@@ -43,7 +43,7 @@ jobs:
         env:
           SPRING_PROFILES_ACTIVE: test
           MYSQL_DATABASE: pmt_test
-        run: mvn -Dtest="IntegrationTestSuite,AuthControllerTest,UserControllerTest,TaskHistoryControllerTest,TaskControllerTest,ProjectControllerTest,ProjectMemberControllerTest" test
+        run: mvn clean verify -Dtest="IntegrationTestSuite,AuthControllerTest,UserControllerTest,TaskHistoryControllerTest,TaskControllerTest,ProjectControllerTest,ProjectMemberControllerTest"
 
       # ===== Frontend (Angular) =====
       - name: Set up Node.js
@@ -95,4 +95,3 @@ jobs:
 
           echo "Pushing frontend image..."
           docker push $FRONTEND_IMAGE
-
