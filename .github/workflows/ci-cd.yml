@@ -63,7 +63,7 @@ jobs:
         working-directory: ./Frontend_PMT
         env:
           NODE_ENV: test
-        run: ng test --watch=false --browsers=ChromeHeadless
+        run: ng test --code-coverage
 
       - name: Build Frontend
         working-directory: ./Frontend_PMT

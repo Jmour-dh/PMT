@@ -45,7 +45,7 @@ PMT est une plateforme de gestion de projet collaboratif destinée aux équipes 
 
 
 ## Lancement du projet en local
--  Lancement du backend
+### Lancement du backend
 
 1. Après avoir installé Dbeaver, crée un serveur sur le port 3306 comme 
         sur l'image suivante :
@@ -137,5 +137,43 @@ Résultat d'une URL sécurisée
 http://localhost:63342/Backend_PMT/target/site/jacoco/index.html?_ijt=3sc916tjg9l329jhb34otj227u&_ij_reload=RELOAD_ON_SAVE
 
 <img src="./screenshot\step_9.png" alt="Step_9" >
+
+### Lancement du frontend
+
+1. Naviguer vers le dossier Frontend_PMT, dans le terminal, puis lancer le script suivant:
+
+```bash
+    npm install
+```
+
+2. Lancer le server
+
+```bash
+    ng serve
+```
+
+3. Ouvrez un navigateur et naviguer vers : http://localhost:4200, pour acceder au frontend.
+
+
+## Test frontend
+
+1. Ouvrez un nouveau Terminal et lancez le script suivant :
+
+```bash
+    ng test --code-coverage
+```
+
+Résultat: 
+
+<img src="./screenshot\step_10.png" alt="Step_10" >
+
+2. Naviguer vers le dossier couvergae et suivre l'image suivante :
+
+<img src="./screenshot\step_11.png" alt="Step_11" >
+
+3. Résultat du couverture de code 
+
+<img src="./screenshot\step_12.png" alt="Step_12" >
+
 
 
