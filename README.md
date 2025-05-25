@@ -2,11 +2,6 @@
 
 PMT est une plateforme de gestion de projet collaboratif destinée aux équipes de développement logiciel. L'objectif est de créer une application qui permettra aux équipes de planifier, suivre et collaborer sur des projets de manière efficace.
 
-# Project Management Tool
-
-PMT est une plateforme de gestion de projet collaboratif destinée aux équipes de développement logiciel. L'objectif est de créer une application qui permettra aux équipes de planifier, suivre et collaborer sur des projets de manière efficace.
-
-
 ## Environment Variables
 
 - J'ai utilisé VS Code comme éditeur de code pour ce projet. Le projet est développé avec springboot maven et angular, pour cela, vous devez configurer votre environnement de développement.
@@ -38,7 +33,7 @@ PMT est une plateforme de gestion de projet collaboratif destinée aux équipes 
 ```bash
     node -v ou node --version
 ```
-4. Installer [Angular](https://angular.dev/installation)avec la ligne de commande suivante:
+4. Installer [Angular](https://angular.dev/installation) avec la ligne de commande suivante:
 - Verifiez l'installation avec la commande:
 
 ```bash
@@ -95,7 +90,7 @@ Après l'exécution de la requette SQL, on observe l'apparition de la base des d
 Le backend va se lancer sur http://localhost:8080
 
 
--  Reference API
+# Reference API
 
 Pour documenter notre API REST, nous avons utilisé Swagger UI (OpenAPI), qui permet :
 
