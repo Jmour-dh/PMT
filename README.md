@@ -123,10 +123,6 @@ Ajoutez le token reçu dans l'en-tête Authorization de vos requêtes suivantes 
     <td><img src="./screenshot/step_5.png" alt="Step 5" width="100%"></td>
     <td><img src="./screenshot/step_6.png" alt="Step 6" width="100%"></td>
   </tr>
-  <tr>
-    <td align="center">Login</td>
-    <td align="center">Requête authentifiée</td>
-  </tr>
 </table>
 
 
