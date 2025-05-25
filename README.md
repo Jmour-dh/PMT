@@ -47,10 +47,39 @@ PMT est une plateforme de gestion de projet collaboratif destinée aux équipes 
 ```
 5. Télécharger [MySQL installer](https://dev.mysql.com/downloads/installe/)  et suivre les insctructions d'installation où bien [Dbeaver 25.0.5](https://dbeaver.io/download/)
 
+
 ## Documentation
 -  Lancement en local
 
-    1. Après avoir installé Dbeaver, crée un serveur sur le port 3306 comme 
+1. Après avoir installé Dbeaver, crée un serveur sur le port 3306 comme 
         sur l'image suivante :
-    <img src="./screenshot\step_1.png" alt="Step_1" >
+<img src="./screenshot\step_1.png" alt="Step_1" >
+
+
+Veillez à bien remplir ces champs:
+
+* Hostname : localhost
+* Username : root
+* Password : root
+
+Après avoir configuré la connection,clique sur le bouton Test de connection :
+<img src="./screenshot\step_2.png" alt="Step_2" >
+
+Une fois accedez à la connection, vous accedez à la page vous permettant de faire des requettes SQL.
+
+La requette suivante permet de créer une nouvelle base des données.
+
+```bash
+    CREATE DATABASE pmt_db
+```
+
+Après l'exécution de la requette SQL, on observe l'apparition de la base des données "donnees" suite à sa création comme sur l'image suivante :
+<img src="./screenshot\step_3.png" alt="Step_3" >
+
+
+2. Créer un répertoire sur le bureau et ouvrez ce répertoire dans VS Code. Cloner le projet avec la commande
+
+```bash
+    git clone https://github.com/Jmour-dh/PMT.git
+```
 
