@@ -118,15 +118,15 @@ Effectuez d'abord une requête de login (POST /api/auth/login) pour obtenir votr
 2. Utilisation du Token :
 
 Ajoutez le token reçu dans l'en-tête Authorization de vos requêtes suivantes :
-<div style="display: flex; gap: 10px;">
-  <div style="flex: 1;">
-    <img src="./screenshot/step_5.png" alt="Step_5" style="width: 100%;">
-    <p style="text-align: center;">Étape 5 - Login</p>
-  </div>
-  <div style="flex: 1;">
-    <img src="./screenshot/step_6.png" alt="Step_6" style="width: 100%;">
-    <p style="text-align: center;">Étape 6 - Requête authentifiée</p>
-  </div>
-</div>
+<table>
+  <tr>
+    <td><img src="./screenshot/step_5.png" alt="Step 5" width="100%"></td>
+    <td><img src="./screenshot/step_6.png" alt="Step 6" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center">Login</td>
+    <td align="center">Requête authentifiée</td>
+  </tr>
+</table>
 
 
