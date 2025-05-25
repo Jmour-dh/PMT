@@ -99,15 +99,19 @@ La requette suivante permet de créer une nouvelle base des données.
 Après l'exécution de la requette SQL, on observe l'apparition de la base des données "donnees" suite à sa création comme sur l'image suivante :
 <img src="./screenshot\step_3.png" alt="Step_3" >
 
+2. Naviguez dans le dossier resources, copiez le code du fichier script.sql comme indiqué sur l'image, 
+<img src="./screenshot\step_14.png" alt="Step_14" >
 
-2. Créer un répertoire sur le bureau et ouvrez ce répertoire dans VS Code. Cloner le projet avec la commande
+3. Exécutez-le dans DBeaver
+
+4. Créer un répertoire sur le bureau et ouvrez ce répertoire dans VS Code. Cloner le projet avec la commande
 
 ```bash
     git clone https://github.com/Jmour-dh/PMT.git
 ```
 
-3. Naviguez dans le dossier Backend_PMT
-4. Ouvrez un nouveau Terminal à la racine du projet puis naviguez vers le dossier Backend_PMT, et lancez le script suivant:
+5. Naviguez dans le dossier ressouces Backend_PMT
+6. Ouvrez un nouveau Terminal à la racine du projet puis naviguez vers le dossier Backend_PMT, et lancez le script suivant:
 
 
 ```bash
@@ -115,6 +119,7 @@ Après l'exécution de la requette SQL, on observe l'apparition de la base des d
 ```
 
 Le backend va se lancer sur http://localhost:8080
+
 
 
 ## Reference API

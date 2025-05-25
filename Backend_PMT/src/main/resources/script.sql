@@ -53,10 +53,10 @@ CREATE TABLE task_history (
 );
 
 -- Insertion des données de test
-INSERT INTO users (username, email, password_hash) VALUES
-('admin', 'admin@example.com', '$2a$10$WDZfMHrFNvgwxiPwJ0Is8ewh/enm8rKhJTZx6hlYDabxP5XYZSG3W'),-- le password est : 123456,
+INSERT INTO users (username, email, password_hash) VALUE
 ('user1', 'user1@example.com', '$2a$10$WDZfMHrFNvgwxiPwJ0Is8ewh/enm8rKhJTZx6hlYDabxP5XYZSG3W'),-- le password est : 123456,
 ('user2', 'user2@example.com', '$2a$10$WDZfMHrFNvgwxiPwJ0Is8ewh/enm8rKhJTZx6hlYDabxP5XYZSG3W');-- le password est : 123456,
+('user3', 'user3@example.com', '$2a$10$WDZfMHrFNvgwxiPwJ0Is8ewh/enm8rKhJTZx6hlYDabxP5XYZSG3W'),-- le password est : 123456,
 
 INSERT INTO projects (name, description, start_date, created_by) VALUES
 ('Project A', 'Description of Project A', '2023-01-01 10:00:00', 1),
