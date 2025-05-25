@@ -48,8 +48,9 @@ PMT est une plateforme de gestion de projet collaboratif destinée aux équipes 
 5. Télécharger [MySQL installer](https://dev.mysql.com/downloads/installe/)  et suivre les insctructions d'installation où bien [Dbeaver 25.0.5](https://dbeaver.io/download/)
 
 
-## Documentation
--  Lancement en local
+
+## Lancement du projet en local
+-  Lancement du backend
 
 1. Après avoir installé Dbeaver, crée un serveur sur le port 3306 comme 
         sur l'image suivante :
@@ -82,4 +83,50 @@ Après l'exécution de la requette SQL, on observe l'apparition de la base des d
 ```bash
     git clone https://github.com/Jmour-dh/PMT.git
 ```
+
+3. Naviguez dans le dossier ressouces Backend_PMT
+4. Ouvrez un nouveau Terminal à la racine du projet puis naviguez vers le dossier Backend_PMT, et lancez le script suivant:
+
+
+```bash
+   mvn spring-boot:run  
+```
+
+Le backend va se lancer sur http://localhost:8080
+
+
+-  Reference API
+
+Pour documenter notre API REST, nous avons utilisé Swagger UI (OpenAPI), qui permet :
+
+Une documentation interactive et automatique des endpoints
+
+* La visualisation des modèles de données (DTOs)
+
+* La possibilité de tester directement les requêtes depuis l'interface
+
+* L'interface Swagger est accessible à cette URL lorsque l'application est en marche :
+http://localhost:8080/swagger-ui.html
+
+Pour tester les routes sécurisées par JWT Token, voici la procédure à suivre :
+
+1. Authentification :
+
+Effectuez d'abord une requête de login (POST /api/auth/login) pour obtenir votre token JWT
+<img src="./screenshot\step_4.png" alt="Step_4" >
+
+2. Utilisation du Token :
+
+Ajoutez le token reçu dans l'en-tête Authorization de vos requêtes suivantes :
+<div style="display: flex; gap: 10px;">
+  <div style="flex: 1;">
+    <img src="./screenshot/step_5.png" alt="Step_5" style="width: 100%;">
+    <p style="text-align: center;">Étape 5 - Login</p>
+  </div>
+  <div style="flex: 1;">
+    <img src="./screenshot/step_6.png" alt="Step_6" style="width: 100%;">
+    <p style="text-align: center;">Étape 6 - Requête authentifiée</p>
+  </div>
+</div>
+
 
