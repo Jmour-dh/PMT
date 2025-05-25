@@ -2,6 +2,13 @@
 
 PMT est une plateforme de gestion de projet collaboratif destinée aux équipes de développement logiciel. L'objectif est de créer une application qui permettra aux équipes de planifier, suivre et collaborer sur des projets de manière efficace.
 
+## Préréquis
+
+- [Utiliser un éditeur de code](https://www.oracle.com/java/technologies/downloads/)
+- [Connaissance en JAVA, SpringBoot](https://docs.spring.io/spring-framework/reference/index.html)
+- [Connaissance en de Git et Github](https://docs.github.com/fr)
+- [Connaissance en docker](https://docs.docker.com/)
+
 ## Environment Variables
 
 - J'ai utilisé VS Code comme éditeur de code pour ce projet. Le projet est développé avec springboot maven et angular, pour cela, vous devez configurer votre environnement de développement.
@@ -12,6 +19,8 @@ PMT est une plateforme de gestion de projet collaboratif destinée aux équipes 
 `Node.js 22.12.0 ou supérieur`
 `Angular CLI 19.2.0 ou supérieur`
 `MySQL 8.0.21 ou supérieur`
+`Docker 28.1.1 ou supérieur`
+`Docker compose 2.35.1 ou supérieur`
 
 ## Installation
 
@@ -42,10 +51,23 @@ PMT est une plateforme de gestion de projet collaboratif destinée aux équipes 
 ```
 5. Télécharger [MySQL installer](https://dev.mysql.com/downloads/installe/)  et suivre les insctructions d'installation où bien [Dbeaver 25.0.5](https://dbeaver.io/download/)
 
+6. Installer Docker Desktop
+
+```bash
+   wsl --install
+```
+
+* Téléchargez Docker Desktop pour Windows depuis https://www.docker.com/products/docker-desktop/
+
+* Double-cliquez sur le fichier .exe téléchargé pour lancer l'installation
+
+* Suivez les instructions de l'assistant d'installation
+
+* Redémarrez votre ordinateur si demandé
 
 
-## Lancement du projet en local
-### Lancement du backend
+# Lancement du projet en local
+## Lancement du backend
 
 1. Après avoir installé Dbeaver, crée un serveur sur le port 3306 comme 
         sur l'image suivante :
@@ -138,7 +160,7 @@ http://localhost:63342/Backend_PMT/target/site/jacoco/index.html?_ijt=3sc916tjg9
 
 <img src="./screenshot\step_9.png" alt="Step_9" >
 
-### Lancement du frontend
+## Lancement du frontend
 
 1. Naviguer vers le dossier Frontend_PMT, dans le terminal, puis lancer le script suivant:
 
@@ -155,7 +177,7 @@ http://localhost:63342/Backend_PMT/target/site/jacoco/index.html?_ijt=3sc916tjg9
 3. Ouvrez un navigateur et naviguer vers : http://localhost:4200, pour acceder au frontend.
 
 
-## Test frontend
+### Test frontend
 
 1. Ouvrez un nouveau Terminal et lancez le script suivant :
 
@@ -174,6 +196,20 @@ Résultat:
 3. Résultat du couverture de code 
 
 <img src="./screenshot\step_12.png" alt="Step_12" >
+
+## Lancement docker compose
+Naviguer dans le racine du projet pmt
+
+1. Lancer docker desktop 
+
+2. Lancer cette commande 
+
+```bash
+   docker-compose up --build
+```
+
+3. Voila la résultat de lancement du coker compose : 
+<img src="./screenshot\step_13.png" alt="Step_13" >
 
 
 
