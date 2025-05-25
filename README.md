@@ -120,6 +120,9 @@ Ajoutez le token reçu dans l'en-tête Authorization de vos requêtes suivantes 
   </tr>
 </table>
 
+Résultat d'une URL sécurisée
+<img src="./screenshot\step_7.png" alt="Step_7" >
+
 ## Test backend
 1. Ouvrez un nouveau Terminal à la racine du projet puis naviguez vers le dossier Backend_PMT, et lancez le script suivant :
 
@@ -130,7 +133,8 @@ Ajoutez le token reçu dans l'en-tête Authorization de vos requêtes suivantes 
 2. Pour voir le résultat, naviguez dans le dossier target comme indiqué sur l'image.
 <img src="./screenshot\step_8.png" alt="Step_8" >
 
-3. http://localhost:63342/Backend_PMT/target/site/jacoco/index.html?_ijt=3sc916tjg9l329jhb34otj227u&_ij_reload=RELOAD_ON_SAVE
+3. Voici le lien 
+http://localhost:63342/Backend_PMT/target/site/jacoco/index.html?_ijt=3sc916tjg9l329jhb34otj227u&_ij_reload=RELOAD_ON_SAVE
 
 <img src="./screenshot\step_9.png" alt="Step_9" >
 
